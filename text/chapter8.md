@@ -638,7 +638,7 @@ main = do
   where
     printException e = do
       log (message e)
-      return defaultConfig
+      pure defaultConfig
 ```
 
 The `purescript-eff` package also defines the `runPure` handler, which takes a computation with _no_ side-effects, and safely evaluates it as a pure value:

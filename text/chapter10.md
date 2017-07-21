@@ -477,7 +477,7 @@ Notice that the `random` function is represented at runtime as a function of no 
 As a slightly more interesting example, consider the `log` function defined by the `Control.Monad.Eff.Console` module in the `purescript-console` package. The `log` function has the following type:
 
 ```haskell
-foreign import log ::: forall eff. String -> Eff (console :: CONSOLE | eff) Unit
+foreign import log :: forall eff. String -> Eff (console :: CONSOLE | eff) Unit
 ```
 
 And here is its definition:
@@ -704,7 +704,7 @@ To be able to parse the generated JSON document, we need to be able to read obje
 
 ```haskell
 (!) :: Index i => Foreign -> i -> F Foreign
-readProp :: forall a i. (IsForeign a, Index i) => i -> Foreign -> F a
+readProp :: forall a i. IsForeign a => Index i => i -> Foreign -> F a
 ```
 
 The type class `Index` represents those types which can be used to index properties on foreign values. Instances are provided for `String` (for accessing object properties) and `Int` (for accessing array elements).

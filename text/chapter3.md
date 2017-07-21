@@ -89,7 +89,7 @@ The error in the last example is an error from the type checker, which unsuccess
 Records correspond to JavaScript's objects, and record literals have the same syntax as JavaScript's object literals:
 
 ```text
-> let author = { name: "Phil", interests: ["Functional Programming", "JavaScript"] }
+> author = { name: "Phil", interests: ["Functional Programming", "JavaScript"] }
 
 > :type author
 { name :: String
@@ -131,9 +131,8 @@ Alternatively, functions can be defined inline, by using a backslash character f
 
 ```text
 > :paste
-… let
-…   add :: Int -> Int -> Int
-…   add = \x y -> x + y
+… add :: Int -> Int -> Int
+… add = \x y -> x + y
 … ^D
 ```
 
@@ -203,8 +202,8 @@ Generally, any declarations defined in the same block should be indented at the 
 
 ```text
 > :paste
-… let x = 1
-…     y = 2
+… x = 1
+… y = 2
 … ^D
 ```
 
@@ -212,8 +211,8 @@ but this is not:
 
 ```text
 > :paste
-… let x = 1
-…      y = 2
+… x = 1
+…  y = 2
 … ^D
 ```
 
@@ -254,7 +253,7 @@ type Address =
 
 Note that records can contain other records.
 
-Now let's define a third type synonym, for our address book data structure, which will represented simply as a linked list of entries:
+Now let's define a third type synonym, for our address book data structure, which will be represented simply as a linked list of entries:
 
 ```haskell
 type AddressBook = List Entry
@@ -273,27 +272,27 @@ If we try to incorrectly define a value of type `List` (by using the type annota
 ```text
 > import Data.List
 > Nil :: List
-In a type-annotated expression x :: t, the type t must have kind *
+In a type-annotated expression x :: t, the type t must have kind Type
 ```
 
 This is a _kind error_. Just like values are distinguished by their _types_, types are distinguished by their _kinds_, and just like ill-typed values result in _type errors_, _ill-kinded_ types result in _kind errors_.
 
-There is a special kind called `*` which represents the kind of all types which have values, like `Number` and `String`.
+There is a special kind called `Type` which represents the kind of all types which have values, like `Number` and `String`.
 
-There are also kinds for type constructors. For example, the kind `* -> *` represents a function from types to types, just like `List`. So the error here occurred because values are expected to have types with kind `*`, but `List` has kind `* -> *`.
+There are also kinds for type constructors. For example, the kind `Type -> Type` represents a function from types to types, just like `List`. So the error here occurred because values are expected to have types with kind `Type`, but `List` has kind `Type -> Type`.
 
 To find out the kind of a type, use the `:kind` command in PSCi. For example:
 
 ```text
 > :kind Number
-*
+Type
 
 > import Data.List
 > :kind List
-* -> *
+Type -> Type
 
 > :kind List String
-*
+Type
 ```
 
 PureScript's _kind system_ supports other interesting kinds, which we will see later in the book.
@@ -346,7 +345,7 @@ $ pulp psci
 We can create an entry by using a record literal, which looks just like an anonymous object in JavaScript. Bind it to a name with a `let` expression:
 
 ```text
-> let address = { street: "123 Fake St.", city: "Faketown", state: "CA" }
+> address = { street: "123 Fake St.", city: "Faketown", state: "CA" }
 ```
 
 Now, try applying our function to the example:
@@ -360,7 +359,7 @@ Now, try applying our function to the example:
 Let's also test `showEntry` by creating an address book entry record containing our example address:
 
 ```text
-> let entry = { firstName: "John", lastName: "Smith", address: address }
+> entry = { firstName: "John", lastName: "Smith", address: address }
 > showEntry entry
 
 "Smith, John: 123 Fake St., Faketown, CA"
@@ -656,13 +655,13 @@ That's better - the return value `Nothing` indicates that the optional return va
 For ease of use, we can create a function which prints an `Entry` as a String, so that we don't have to use `showEntry` every time:
 
 ```text
-> let printEntry firstName lastName book = map showEntry (findEntry firstName lastName book)
+> printEntry firstName lastName book = map showEntry (findEntry firstName lastName book)
 ```
 
 Now let's create a non-empty address book, and try again. We'll reuse our example entry from earlier:
 
 ```text
-> let book1 = insertEntry entry emptyBook
+> book1 = insertEntry entry emptyBook
 
 > printEntry "John" "Smith" book1
 
