@@ -32,7 +32,7 @@ PureScript 표준 라이브러리의 함수들도 몇 개 살펴볼 것이다. �
 
 PureScript에서 재귀의 간단한 예 몇 가지를 보자.
 
-다음은 일반적인 **팩토리얼 함수**이다. 
+다음은 일반적인 **팩토리얼 함수**이다.
 
 ```haskell
 fact :: Int -> Int
@@ -181,9 +181,9 @@ infix 8 range as ..
 
 ## 배열 필터링
 
-The `Data.Array` module provides another function `filter`, which is commonly used together with `map`. It provides the ability to create a new array from an existing array, keeping only those elements which match a predicate function.
+`Data.Array` 모듈에는 `filter` 함수도 있다. 주로 `map`과 함께 사용할 수 있다. `filter` 함수는 기존의 배열에서 어떤 조건 함수를 만족시키는 요소들만 뽑아 새로운 배열을 만들어준다.
 
-For example, suppose we wanted to compute an array of all numbers between 1 and 10 which were even. We could do so as follows:
+예를 들어보자. 1부터 10까지의 수 중에서 짝수만으로 구성된 배열을 만들어야 한다면 다음처럼 계산할 수 있다.
 
 ```text
 > import Data.Array
@@ -192,15 +192,15 @@ For example, suppose we wanted to compute an array of all numbers between 1 and 
 [2,4,6,8,10]
 ```
 
-X> ## Exercises
-X>
-X> 1. (Easy) Use the `map` or `<$>` function to write a function which calculates the squares of an array of numbers.
-X> 1. (Easy) Use the `filter` function to write a function which removes the negative numbers from an array of numbers.
-X> 1. (Medium) Define an infix synonym `<$?>` for `filter`. Rewrite your answer to the previous question to use your new operator. Experiment with the precedence level and associativity of your operator in PSCi.
+> ## 연습 문제
+>
+> 1. (쉬움) 주어진 숫자 배열로부터 그 제곱들로 된 배열을 계산하는 함수를 `map`이나 `<$>` 함수를 사용하여 작성해보라.
+> 1. (쉬움) 주어진 숫자 배열에서 음수를 제거하는 함수를 `filter`를 이용하여 작성해보라.
+> 1. (보통) `filter`에 대응하는 `<$?>` 중위 연산자를 정의해보라. 앞 문제를 새로 정의한 연산자로 다시 풀어보라. 이 연산자는 우선순위가 얼마가 되어야 할까? 결합 방향은 어느 쪽이어야 할까? PSCi에서 실험해보라.
 
-## Flattening Arrays
+## 배열 펼치기
 
-Another standard function on arrays is the `concat` function, defined in `Data.Array`. `concat` flattens an array of arrays into a single array:
+`Data.Array`에 정의된 배열에 관한 표준 함수 중에서 이번에는 `concat`을 살펴보자. `concat`은 배열의 배열을 펼쳐서 단순 배열로 만들어준다.
 
 ```text
 > import Data.Array
@@ -212,9 +212,9 @@ forall a. Array (Array a) -> Array a
 [1, 2, 3, 4, 5, 6]
 ```
 
-There is a related function called `concatMap` which is like a combination of the `concat` and `map` functions. Where `map` takes a function from values to values (possibly of a different type), `concatMap` takes a function from values to arrays of values.
+`concat` 함수와 관련된 `concatMap`이란 함수도 있다. 이 함수는 이름처럼 `concat`과 `map`을 합쳐놓은 것과 비슷하다. `map`이 인자로 받는 매핑 함수는 배열의 요소를 다른 값(다른 타입도 가능)으로 바꿔주는데 반해 `concatMap`이 인자로 받는 매핑 함수는 배열 요소 하나를 새로운 배열로 만든다.
 
-Let's see it in action:
+어떻게 동작하는지 알아보자.
 
 ```text
 > import Data.Array
@@ -226,34 +226,36 @@ forall a b. (a -> Array b) -> Array a -> Array b
 [1,1,2,4,3,9,4,16,5,25]
 ```
 
-Here, we call `concatMap` with the function `\n -> [n, n * n]` which sends an integer to the array of two elements consisting of that integer and its square. The result is an array of ten integers: the integers from 1 to 5 along with their squares.
+`concatMap`의 인자로 전달한 `\n -> [n, n * n]` 함수는 정수를 받아서 그 자신과 제곱으로 만들어지는 배열을 반환한다. `concatMap`을 적용한 결과는 1에서 5까지의 값들과 그 제곱값들로 된 10개짜리 배열이다.
 
-Note how `concatMap` concatenates its results. It calls the provided function once for each element of the original array, generating an array for each. Finally, it collapses all of those arrays into a single array, which is its result.
+`concatMap`은 개별 매핑 결과를 이어붙인다는 점을 알아두자. 매핑 함수를 원본 배열의 각 요소들에 적용시켜서 그 결과로 얻어지는 배열들을 다시 하나의 배열로 만들어 반환한다.
 
-`map`, `filter` and `concatMap` form the basis for a whole range of functions over arrays called "array comprehensions".
+`map`, `filter`, `concatMap`은 배열과 관련된 다양한 함수들, 특히 "배열 다루기"의 근간이 된다.
 
-## Array Comprehensions
+## 배열 다루기
 
-Suppose we wanted to find the factors of a number `n`. One simple way to do this would be by brute force: we could generate all pairs of numbers between 1 and `n`, and try multiplying them together. If the product was `n`, we would have found a pair of factors of `n`.
+어떤 숫자 `n`의 약수들을 구하는 문제가 있다고 하자. 단순 무식하게 접근하자면
+1부터 `n`까지의 모든 숫자들로 쌍을 만들어서 그 곱이 `n`이 되는지 확인하고, 만약 맞다면 그 쌍을 이루는 두 값이 모두 약수임을 알 수 있다.
 
-We can perform this computation using an array comprehension. We will do so in steps, using PSCi as our interactive development environment.
+이러한 접근 방식을 배열 이해 문법으로 구현할 수 있다. PSCi에서 한 스텝씩 차근차근 진행해보자.
 
-The first step is to generate an array of pairs of numbers below `n`, which we can do using `concatMap`.
+첫 번째 단계는 `n`까지의 숫자들 쌍을 모두 출력하는 것이다. `concatMap`을 이용할 수 있다.
 
-Let's start by mapping each number to the array `1 .. n`:
+`1 .. n` 배열의 각 숫자들에 대해 `1 .. n`을 매핑시키면 될 것 같다.
 
 ```text
 > pairs n = concatMap (\i -> 1 .. n) (1 .. n)
 ```
 
-We can test our function
+간단히 3으로 테스트해보자.
 
 ```text
 > pairs 3
 [1,2,3,1,2,3,1,2,3]
 ```
 
-This is not quite what we want. Instead of just returning the second element of each pair, we need to map a function over the inner copy of `1 .. n` which will allow us to keep the entire pair:
+기대했던 결과가 아니다. 쌍을 구성할 두 번째 값이 그냥 반환되어 버린 것과 같다.
+대신 `1 .. n`에 매핑시킬 때 쌍의 첫 번째 값을 사용하면 원하는 전체 쌍을 얻을 수 있을 것이다.
 
 ```text
 > :paste
@@ -267,7 +269,7 @@ This is not quite what we want. Instead of just returning the second element of 
 [[1,1],[1,2],[1,3],[2,1],[2,2],[2,3],[3,1],[3,2],[3,3]]
 ```
 
-This is looking better. However, we are generating too many pairs: we keep both [1, 2] and [2, 1] for example. We can exclude the second case by making sure that `j` only ranges from `i` to `n`:
+결과가 좀더 그럴듯하다. 그런데 쌍을 너무 많이 만들어낸 것 같다. 이 문제에서 `[1, 2]`나 `[2, 1]`를 모두 생성할 필요는 없다. 두 번째 경우를 무시하기 위해 내부 매핑 범위를 `i`부터 `n`으로 변경하자.
 
 ```text
 > :paste
@@ -280,7 +282,8 @@ This is looking better. However, we are generating too many pairs: we keep both 
 [[1,1],[1,2],[1,3],[2,2],[2,3],[3,3]]
 ```
 
-Great! Now that we have all of the pairs of potential factors, we can use `filter` to choose the pairs which multiply to give `n`:
+멋지다. 이 함수를 통해 우리는 약수가 될 후보들의 쌍들을 모두 찾을 수 있다.
+이제 여기에 `filter`를 적용하여 곱이 `n`이 되는 것만 가려내자.
 
 ```text
 > import Data.Foldable
@@ -291,17 +294,17 @@ Great! Now that we have all of the pairs of potential factors, we can use `filte
 [[1,10],[2,5]]
 ```
 
-This code uses the `product` function from the `Data.Foldable` module in the `purescript-foldable-traversable` library.
+`Data.Foldable` 모듈에 정의된 `product` 함수를 이용했다. (이 모듈은 `purescript-foldable-traversable` 라이브러리에 있다.)
 
-Excellent! We've managed to find the correct set of factor pairs without duplicates.
+훌륭하다! 중복된 결과 없이 약수들의 쌍을 구해낼 수 있었다.
 
-## Do Notation
+## Do 표기법
 
-However, we can improve the readability of our code considerably. `map` and `concatMap` are so fundamental, that they (or rather, their generalizations `map` and `bind`) form the basis of a special syntax called _do notation_.
+여기서 코드 가독성을 더 향상시킬 수 있다. `map`, `concatMap` 함수는 워낙 기본적이어서 (사실 이 함수들을 더 일반화시킨 `map`과 `bind` 함수는) **do 표기법**이라고 하는 특별한 문법을 사용하는데 기본 요건이다.
 
-_Note_: Just like `map` and `concatMap` allowed us to write _array comprehensions_, the more general operators `map` and `bind` allow us to write so-called _monad comprehensions_. We'll see plenty more examples of _monads_ later in the book, but in this chapter, we will only consider arrays.
+**주의**: `map`과 `concatMap`을 사용하여 **배열 다루기**를 할 수 있는 것처럼 이 함수들을 더 일반화한 `map`과 `bind` 함수를 사용하여 **모나드 다루기**를 할 수도 있다. 모나드는 이 책 뒤에서 더 다양한 예제들과 함께 살펴보기로 하고, 여기서는 배열만 다룰 것이다.
 
-We can rewrite our `factors` function using do notation as follows:
+`factors` 함수는 do 표기법으로 고쳐쓸 수 있다.
 
 ```haskell
 factors :: Int -> Array (Array Int)
@@ -311,22 +314,24 @@ factors n = filter (\xs -> product xs == n) $ do
   pure [i, j]
 ```
 
-The keyword `do` introduces a block of code which uses do notation. The block consists of expressions of a few types:
+`do` 키워드에 이어지는 코드 블록은 몇 가지 형식을 따른다.
 
-- Expressions which bind elements of an array to a name. These are indicated with the backwards-facing arrow `<-`, with a name on the left, and an expression on the right whose type is an array.
-- Expressions which do not bind elements of the array to names. The last line `pure [i, j]` is an example of this kind of expression.
-- Expressions which give names to expressions, using the `let` keyword.
+- 배열 요소들을 이름에 바인드하는 표현식. `<-` 역화살표 왼쪽에 바인드되는 이름이, 오른쪽에 배열(로 계산되는) 표현식이 나타난다.
+- 배열 요소를 바인드하지 않는 표현식. 예를 들어 마지막 줄의 `pure [i, j]` 같은 표현식.
+- `let` 키워드를 이용하여 어떤 표현식을 이름에 바인드하는 표현식.
 
-This new notation hopefully makes the structure of the algorithm clearer. If you mentally replace the arrow `<-` with the word "choose", you might read it as follows: "choose an element `i` between 1 and n, then choose an element `j` between `i` and `n`, and return `[i, j]`".
+이러한 새 표기법은 알고리즘 구조를 더 명료하게 보여준다. `<-` 역화살표를 "... 중에서 고르기" 정도로 읽을 수 있는데, 그러면 위 정의를 다음처럼 읽을 수 있다.
+"`i`를 1부터 `n`에서 고르고, `j`를 `i`부터 `n` 사이에서 고르고, `[i, j]`를 반환한다."
 
-In the last line, we use the `pure` function. This function can be evaluated in PSCi, but we have to provide a type:
+마지막 줄에 사용된 `pure` 함수를 PSCi에서 살펴보려면 타입을 추가로 표기해줘야 한다.
 
 ```text
 > pure [1, 2] :: Array (Array Int)
 [[1, 2]]
 ```
 
-In the case of arrays, `pure` simply constructs a singleton array. In fact, we could modify our `factors` function to use this form, instead of using `pure`:
+배열의 경우 `pure`는 인자를 하나 가지는 싱글턴 배열을 만들어준다.
+사실 `factor` 함수에서는 `pure`를 사용하는 대신 이중 배열을 사용해도 된다.
 
 ```haskell
 factors :: Int -> Array (Array Int)
@@ -336,11 +341,12 @@ factors n = filter (\xs -> product xs == n) $ do
   [[i, j]]
 ```
 
-and the result would be the same.
+결과는 똑같다.
 
-## Guards
+## 가드: 조건 검사
 
-One further change we can make to the `factors` function is to move the filter inside the array comprehension. This is possible using the `guard` function from the `Control.MonadZero` module (from the `purescript-control` package):
+한 걸음 더 나아가보자. 배열 다루기 중에 필터링을 할 수도 있다.
+`Control.MonadZero` 모듈에 정의된 `guard` 함수를 이용하면 된다.(`purescript-control` 패키지)
 
 ```haskell
 import Control.MonadZero (guard)
@@ -353,7 +359,8 @@ factors n = do
   pure [i, j]
 ```
 
-Just like `pure`, we can apply the `guard` function in PSCi to understand how it works. The type of the `guard` function is more general than we need here:
+`pure`와 마찬가지로 `guard` 함수를 PSCi에서 따로 확인해 볼 수 있다.
+`guard` 함수의 타입은 배열을 다루는 것을 넘어 더 일반화되어 있다.
 
 ```text
 > import Control.MonadZero
@@ -362,13 +369,13 @@ Just like `pure`, we can apply the `guard` function in PSCi to understand how it
 forall m. MonadZero m => Boolean -> m Unit
 ```
 
-In our case, we can assume that PSCi reported the following type:
+우리 경우는 다음의 타입을 가진다고 가정하자.
 
 ```haskell
 Boolean -> Array Unit
 ```
 
-For our purposes, the following calculations tell us everything we need to know about the `guard` function on arrays:
+배열 다루기에서의  `guard` 역할은 아래처럼 실행시켜 보면 명확해진다.
 
 ```text
 > import Data.Array
@@ -380,22 +387,22 @@ For our purposes, the following calculations tell us everything we need to know 
 0
 ```
 
-That is, if `guard` is passed an expression which evaluates to `true`, then it returns an array with a single element. If the expression evaluates to `false`, then its result is empty.
+`guard`에 전달된 표현식, 혹은 조건이 `true`가 되면 길이가 1인 배열을 반환하고, `false`가 되면 비어있는 배열을 반환한다.
 
-This means that if the guard fails, then the current branch of the array comprehension will terminate early with no results. This means that a call to `guard` is equivalent to using `filter` on the intermediate array. Depending on the application, you might prefer to use `guard` instead of a `filter`. Try the two definitions of `factors` to verify that they give the same results.
+즉, 조건 검사가 실패하면 진행 중인 배열 다루기 줄기를 더이상 진행하지 결과 없이 종료한다. 중간 결과로 생성되는 배열에 대해 `filter`를 적용한 것과 같은 결과를 낳는다. 상황에 따라 `filter`를 쓰거나 그 대신 `guard`를 쓸 수 있다. 두 가지 버전의 `factors` 함수가 똑같이 동작하는지 확인해보라.
 
-X> ## Exercises
-X>
-X> 1. (Easy) Use the `factors` function to define a function `isPrime` which tests if its integer argument is prime or not.
-X> 1. (Medium) Write a function which uses do notation to find the _cartesian product_ of two arrays, i.e. the set of all pairs of elements `a`, `b`, where `a` is an element of the first array, and `b` is an element of the second.
-X> 1. (Medium) A _Pythagorean triple_ is an array of numbers `[a, b, c]` such that `a² + b² = c²`. Use the `guard` function in an array comprehension to write a function `triples` which takes a number `n` and calculates all Pythagorean triples whose components are less than `n`. Your function should have type `Int -> Array (Array Int)`.
-X> 1. (Difficult) Write a function `factorizations` which produces all _factorizations_ of an integer `n`, i.e. arrays of integers whose product is `n`. _Hint_: for an integer greater than 1, break the problem down into two subproblems: finding the first factor, and finding the remaining factors.
+> ## 연습 문제
+>
+> 1. (쉬움) `factors` 함수를 이용하여 소수인지 판별하는 `isPrime` 함수를 작성해보라.
+> 1. (보통) do 표기법을 써서 두 배열의 **완전 곱(cartesian product)**을 계산하는 함수를 작성해보라.
+> 1. (보통) `a² + b² = c²`를 만족하는 `[a, b, c]`를 **피타고라스 삼조**라고 한다. `guard` 함수를 사용하는 배열 다루기를 이용하여 주어진 수 `n`보다 작은 수들로 된 모든 피타고라스 삼조를 계산하는 `triples` 함수를 작성해보라. 이 함수의 타입을 `Int -> Array (Array Int)`로 한다.
+> 1. (어려움) 어떤 정수 `n`에 대해 가능한 모든 인수 분해를 계산하는 `factorizations` 함수를 작성해보라. **힌트**: 1보다 큰 정수에 대해서는 첫 번째 인수를 찾는 문제와 남은 인수들을 찾는 문제로 나눠서 접근할 수 있다.
 
-## Folds
+## Fold: 접고 포개기
 
-Left and right folds over arrays provide another class of interesting functions which can be implemented using recursion.
+배열을 왼쪽으로 접어가는 것과 오른쪽으로 접어가는 fold 함수들이 있다. 재귀로 구현되는 재미난 함수들이다.
 
-Start by importing the `Data.Foldable` module, and inspecting the types of the `foldl` and `foldr` functions using PSCi:
+`Data.Foldable` 모듈을 임포트하여 `foldl`과 `foldr` 함수의 타입부터 알아보자.
 
 ```text
 > import Data.Foldable
@@ -407,7 +414,7 @@ forall a b f. Foldable f => (b -> a -> b) -> b -> f a -> b
 forall a b f. Foldable f => (a -> b -> b) -> b -> f a -> b
 ```
 
-These types are actually more general than we are interested in right now. For the purposes of this chapter, we can assume that PSCi had given the following (more specific) answer:
+이번에도 타입이 꽤 일반적이지만 지금 우리가 관심을 가지는 배열에 대해 적용해보면 대략 아래와 같은 타입을 가진다고 볼 수 있다.
 
 ```text
 > :type foldl
@@ -417,25 +424,25 @@ forall a b. (b -> a -> b) -> b -> Array a -> b
 forall a b. (a -> b -> b) -> b -> Array a -> b
 ```
 
-In both of these cases, the type `a` corresponds to the type of elements of our array. The type `b` can be thought of as the type of an "accumulator", which will accumulate a result as we traverse the array.
+두 함수 모두 `a`는 배열 요소들의 타입을 말하고, `b`는 계산 결과를 쌓아가는 "누적값"의 타입이다. `b`는 배열 전체를 다 처리한 후 반환하는 결과 타입이기도 하다.
 
-The difference between the `foldl` and `foldr` functions is the direction of the traversal. `foldl` folds the array "from the left", whereas `foldr` folds the array "from the right".
+`foldl`과 `foldr`의 차이는 배열을 접어가는 방향이다. `foldl`은 "왼쪽부터" 접어가고, `foldr`은 "오른쪽부터" 접어간다.
 
-Let's see these functions in action. Let's use `foldl` to sum an array of integers. The type `a` will be `Int`, and we can also choose the result type `b` to be `Int`. We need to provide three arguments: a function `Int -> Int -> Int`, which will add the next element to the accumulator, an initial value for the accumulator of type `Int`, and an array of `Int`s to add. For the first argument, we can just use the addition operator, and the initial value of the accumulator will be zero:
+이 함수들이 어떤 식으로 사용되는지 살펴보자. `foldl`을 사용하여 숫자 배열의 합을 계산할 수 있다. 그러면 `a` 타입은 `Int`가 되고, 결과 타입인 `b` 역시 `Int`가 된다. 인자가 세 개 필요한데, 첫 번째 인자인 `Int -> Int -> Int` 타입의 함수는 누적값에 배열 요소를 하나씩 더하는 일을 하고, 두 번째 인자는 `Int` 타입으로 누적값의 최초 값(혹은 기본 값)을 의미하며, 세 번째 인자는 합을 계산할 `Int`의 배열이다. 첫 번째 인자에는 덧셈 연산자를 사용하면 되고, 초기 누적값은 0을 사용하면 된다.
 
 ```text
 > foldl (+) 0 (1 .. 5)
 15
 ```
 
-In this case, it didn't matter whether we used `foldl` or `foldr`, because the result is the same, no matter what order the additions happen in:
+이 경우는 `foldl`을 쓰나 `foldr`을 쓰나 결과가 다르지 않다. 합을 계산하는데 더하는 순서가 중요하지 않기 때문이다.
 
 ```text
 > foldr (+) 0 (1 .. 5)
 15
 ```
 
-Let's write an example where the choice of folding function does matter, in order to illustrate the difference. Instead of the addition function, let's use string concatenation to build a string:
+두 함수의 차이를 드러내기 위해 접어가는 방향이 중요한 예를 살펴보자. 문자열을 이어붙이는 경우가 여기에 해당한다.
 
 ```text
 > foldl (\acc n -> acc <> show n) "" [1,2,3,4,5]
@@ -445,23 +452,23 @@ Let's write an example where the choice of folding function does matter, in orde
 "54321"
 ```
 
-This illustrates the difference between the two functions. The left fold expression is equivalent to the following application:
+두 함수의 차이가 드러난다. 위의 코드에서 왼쪽으로 접어가는 경우는 아래와 같고,
 
 ```text
 ((((("" <> show 1) <> show 2) <> show 3) <> show 4) <> show 5)
 ```
 
-whereas the right fold is equivalent to this:
+오른쪽으로 접어가는 경우는 아래와 같다.
 
 ```text
 ((((("" <> show 5) <> show 4) <> show 3) <> show 2) <> show 1)
 ```
 
-## Tail Recursion
+## 꼬리 재귀
 
-Recursion is a powerful technique for specifying algorithms, but comes with a problem: evaluating recursive functions in JavaScript can lead to stack overflow errors if our inputs are too large.
+재귀는 알고리즘을 나타낼 때는 강력한 힘을 발휘하지만 문제가 없지 않다. JavaScript에서 재귀 함수를 계산할 때 입력이 큰 경우 스택 오버플로 에러가 발생할 수 있다.
 
-It is easy to verify this problem, with the following code in PSCi:
+이 문제는 PSCi에서 쉽게 확인할 수 있다.
 
 ```text
 > f 0 = 0
@@ -474,17 +481,17 @@ It is easy to verify this problem, with the following code in PSCi:
 RangeError: Maximum call stack size exceeded
 ```
 
-This is a problem. If we are going to adopt recursion as a standard technique from functional programming, then we need a way to deal with possibly unbounded recursion.
+문제가 확실하다. 함수형 프로그래밍에서 재귀를 표준적 기술로 채용하려면 이 문제에 대한 해법이 필요하다.
 
-PureScript provides a partial solution to this problem in the form of _tail recursion optimization_.
+PureScript는 **꼬리 재귀 최적화**라는 형식으로 부분적인 해법을 제공한다.
 
-_Note_: more complete solutions to the problem can be implemented in libraries using so-called _trampolining_, but that is beyond the scope of this chapter. The interested reader can consult the documentation for the `purescript-free` and `purescript-tailrec` packages.
+**주의**: **트램폴리닝**이라고 하는 좀더 완전한 해법이 라이브러리로 구현되어 있다. 하지만 이 장에서 다루기엔 벅찬 내용이다. 관심있는 독자는 `purescript-free`와 `purescript-tailrec` 패키지의 문서를 참고해보기 바란다.
 
-The key observation which enables tail recursion optimization is the following: a recursive call in _tail position_ to a function can be replaced with a _jump_, which does not allocate a stack frame. A call is in _tail position_ when it is the last call made before a function returns. This is the reason why we observed a stack overflow in the example - the recursive call to `f` was _not_ in tail position.
+꼬리 재귀 최적화가 가능한 경우는 제한적이다. 어떤 함수의 **꼬리 위치**에서 재귀 호출이 발생하면 **점프**로 대신하여 스택 프레임 할당을 피할 수 있다는 점이 꼬리 재귀 최적화의 핵심이다. **꼬리 위치**에서의 함수 호출이라는 것은 그 호출의 결과를 바로 반환하는 경우를 말한다. 앞의 예제에서 스택 오버플로가 발생한 이유는 `f` 재귀 호출의 위치가 꼬리가 아니었기 때문이다.
 
-In practice, the PureScript compiler does not replace the recursive call with a jump, but rather replaces the entire recursive function with a _while loop_.
+실제로 PureScript 컴파일러가 꼬리 재귀 호출을 점프로 바꾸는 것은 아니고 재귀 함수 전체를 **while 반복문**으로 만든다.
 
-Here is an example of a recursive function with all recursive calls in tail position:
+다음 예제는 재귀 호출이 꼬리 위치에 있는 경우다.
 
 ```haskell
 fact :: Int -> Int -> Int
@@ -492,13 +499,14 @@ fact 0 acc = acc
 fact n acc = fact (n - 1) (acc * n)
 ```
 
-Notice that the recursive call to `fact` is the last thing that happens in this function - it is in tail position.
+`fact` 재귀 호출의 결과가 그대로 결과값이 된다는 걸 알 수 있다. 그것이 바로 꼬리 위치다.
 
-## Accumulators
+## 누적값
 
-One common way to turn a function which is not tail recursive into a tail recursive function is to use an _accumulator parameter_. An accumulator parameter is an additional parameter which is added to a function which _accumulates_ a return value, as opposed to using the return value to accumulate the result.
+꼬리 재귀가 아닌 재귀 함수를 꼬리 재귀로 바꾸는 일반적인 방법이 **누적값 파라미터**를 이용하는 것이다.
+재귀 함수가 재귀 호출로 계산한 값을 누적 계산하여 반환하는 대신 함수에 추가된 누적값 파라미터를 이용하여 누적 계산해 나가는 방식이다.
 
-For example, consider this array recursion which reverses the input array by appending elements at the head of the input array to the end of the result.
+예를 들어 입력 배열을 거꾸로 뒤집는 재귀 함수를 보자. 이 함수는 입력된 배열을 머리와 꼬리를 따로 떼어낸 다음 재귀적으로 꼬리를 뒤집고 그 뒤에 머리를 붙인다.
 
 ```haskell
 reverse :: forall a. Array a -> Array a
@@ -507,7 +515,7 @@ reverse xs = snoc (reverse (unsafePartial tail xs))
                   (unsafePartial head xs)
 ```
 
-This implementation is not tail recursive, so the generated JavaScript will cause a stack overflow when executed on a large input array. However, we can make it tail recursive, by introducing a second function argument to accumulate the result instead:
+이 구현은 꼬리 재귀가 아니다. 따라서 컴파일러가 생성한 JavaScript는 입력 배열이 매우 큰 경우에 스택 오버플로를 발생할 수 있다. 하지만 이 함수에 결과를 누적시켜 나갈 인자를 추가하여 꼬리 재귀로 바꿀 수 있다.
 
 ```haskell
 reverse :: forall a. Array a -> Array a
@@ -518,17 +526,17 @@ reverse = reverse' []
                                (unsafePartial tail xs)
 ```
 
-In this case, we delegate to the helper function `reverse'`, which performs the heavy lifting of reversing the array. Notice though that the function `reverse'` is tail recursive - its only recursive call is in the last case, and is in tail position. This means that the generated code will be a _while loop_, and will not blow the stack for large inputs.
+`reverse'` 도움 함수를 만들어서 실제 배열을 뒤집는 일을 이 함수가 처리한다. 이제는 `reverse'` 함수가 꼬리 재귀 함수가 되었다. 생성되는 코드에는 **while 반복문**으로 나타날 것이고 입력이 크더라도 스택을 날려버릴 일은 없을 것이다.
 
-To understand the second implementation of `reverse`, note that the helper function `reverse'` essentially uses the accumulator parameter to maintain an additional piece of state - the partially constructed result. The result starts out empty, and grows by one element for every element in the input array. However, because later elements are added at the front of the array, the result is the original array in reverse!
+새로 구현한 `reverse` 함수를 이해하려면 `reverse'` 도움 함수가 상태를 저장하기 위해 누적값 파라미터를 사용하고 있음을 눈여겨봐야 한다. 이 누적값 파라미터는 빈 배열로 시작하여 입력 배열의 요소들을 하나씩 더해 나간다. 이 때 추가되는 요소가 누적값 배열의 앞쪽으로 추가되므로 최종 결과는 입력 배열이 뒤집어진 형태가 된다.
 
-Note also that while we might think of the accumulator as "state", there is no direct mutation going on. The accumulator is an immutable array, and we simply use function arguments to thread the state through the computation.
+누적값을 "상태"라고 생각할 수 있지만 여전히 직접적으로 값을 변경하는 것은 아니다. 누적값은 변경할 수 없는 배열이며 계산 과정의 상태 변화는 함수 인자를 이용하여 이뤄진다.
 
-## Prefer Folds to Explicit Recursion
+## 재귀보다 Fold
 
-If we can write our recursive functions using tail recursion, then we can benefit from tail recursion optimization, so it becomes tempting to try to write all of our functions in this form. However, it is often easy to forget that many functions can be written directly as a fold over an array or similar data structure. Writing algorithms directly in terms of combinators such as `map` and `fold` has the added advantage of code simplicity - these combinators are well-understood, and as such, communicate the _intent_ of the algorithm much better than explicit recursion.
+꼬리 재귀로 재귀 함수를 작성할 수 있다면 꼬리 재귀 최적화의 이득을 취할 수 있다. 재귀 함수를 더 적극적으로 사용할 명분이 된다. 하지만 배열이나 그와 유사한 다른 자료 구조들에 대해 재귀로 작성할 수 있는 함수들 중 상당수는 fold로 구현할 수도 있다. 알고리즘을 `map`이나 `fold`의 조합으로 나타내면 코드가 더 단순해진다는 이득이 더해진다. 왜냐하면 이 함수들(혹은 컴비네이터라도 부른다.)은 워낙 기본적이고 널리 알려져 있기 때문에 직접적인 재귀 구현보다 알고리즘의 **의도**를 더 분명하게 드러낼 수 있다.
 
-For example, the `reverse` example can be written as a fold in at least two ways. Here is a version which uses `foldr`:
+앞에서 본 `reverse` 예제도 두 가지 방식으로 fold를 사용하여 작성할 수 있다. 먼저 `foldr`을 사용하는 구현을 보자.
 
 ```text
 > import Data.Foldable
@@ -542,41 +550,41 @@ For example, the `reverse` example can be written as a fold in at least two ways
 [3,2,1]
 ```
 
-Writing `reverse` in terms of `foldl` will be left as an exercise for the reader.
+`foldl`로 `reverse`를 구현하는 것은 독자를 위한 연습 문제로 남겨둔다.
 
-X> ## Exercises
-X>
-X> 1. (Easy) Use `foldl` to test whether an array of boolean values are all true.
-X> 2. (Medium) Characterize those arrays `xs` for which the function `foldl (==) false xs` returns true.
-X> 3. (Medium) Rewrite the following function in tail recursive form using an accumulator parameter:
-X>
-X>     ```haskell
-X>     import Prelude
-X>     import Data.Array.Partial (head, tail)
-X>     
-X>     count :: forall a. (a -> Boolean) -> Array a -> Int
-X>     count _ [] = 0
-X>     count p xs = if p (unsafePartial head xs)
-X>                    then count p (unsafePartial tail xs) + 1
-X>                    else count p (unsafePartial tail xs)
-X>     ```
-X>
-X> 4. (Medium) Write `reverse` in terms of `foldl`.
+> ## 연습 문제
+>
+> 1. (쉬움) `foldl`을 이용하여 배열의 모든 값들이 참인지 확인해보라.
+> 1. (보통) `foldl (==) false xs`가 참인 배열 `xs`는 어떤 배열일까?
+> 1. (보통) 다음 함수를 누적값 파라미터를 사용하는 꼬리 재귀 함수로 바꿔보라.
+>
+>     ```haskell
+>     import Prelude
+>     import Data.Array.Partial (head, tail)
+>
+>     count :: forall a. (a -> Boolean) -> Array a -> Int
+>     count _ [] = 0
+>     count p xs = if p (unsafePartial head xs)
+>                    then count p (unsafePartial tail xs) + 1
+>                    else count p (unsafePartial tail xs)
+>     ```
+>
+> 1. (보통) `reverse`를 `foldl`로 구현해보라.
 
-## A Virtual Filesystem
+## 가상 파일 시스템
 
-In this section, we're going to apply what we've learned, writing functions which will work with a model of a filesystem. We will use maps, folds and filters to work with a predefined API.
+이 절에서는 지금까지 배운 내용을 응용하여 파일 시스템 모델을 다루기 위한 함수를 작성해보겠다. 이미 정의된 API 위에서 `map`, `fold`, `filter`를 사용할 것이다.
 
-The `Data.Path` module defines an API for a virtual filesystem, as follows:
+`Data.Path` 모듈에는 가상의 파일 시스템에 대한 API가 아래와 같이 정의되어 있다.
 
-- There is a type `Path` which represents a path in the filesystem.
-- There is a path `root` which represents the root directory.
-- The `ls` function enumerates the files in a directory.
-- The `filename` function returns the file name for a `Path`.
-- The `size` function returns the file size for a `Path` which represents a file.
-- The `isDirectory` function tests whether a function is a file or a directory.
+- `Path` 타입은 파일 시스템의 경로(혹은 패스)를 나타낸다.
+- `root` 패스는 루트 디렉터리를 나타낸다.
+- `ls` 함수는 주어진 `Path`에서 파일들의 목록을 반환한다.
+- `filename` 함수는 주어진 `Path`에서 파일 이름만 반환한다.
+- `size` 함수는 주어진 `Path`가 가리키는 파일의 크기를 반환한다.
+- `isDirectory` 함수는 주어진 패스가 가리키는 것이 파일인지 디렉터리인지 판별한다.
 
-In terms of types, we have the following type definitions:
+타입을 보면 아래와 같다.
 
 ```haskell
 root :: Path
@@ -590,7 +598,7 @@ size :: Path -> Maybe Number
 isDirectory :: Path -> Boolean
 ```
 
-We can try out the API in PSCi:
+PSCi에서 API를 살펴볼 수 있다.
 
 ```text
 $ pulp psci
@@ -607,27 +615,29 @@ true
 [/bin/,/etc/,/home/]
 ```
 
-The `FileOperations` module defines functions which use the `Data.Path` API. You do not need to modify the `Data.Path` module, or understand its implementation. We will work entirely in the `FileOperations` module.
+`FileOperations` 모듈은 `Data.Path` API를 사용하는 함수들을 정의한다. 여러분은 `Data.Path`를 수정하거나 구현을 들여다 볼 필요는 없다.
+`FileOperations` 모듈이 우리 작업 영역이다.
 
-## Listing All Files
+## 모든 파일 리스트 보기
 
-Let's write a function which performs a deep enumeration of all files inside a directory. This function will have the following type:
+어떤 디렉터리 아래의 모든 파일들을 리스트로 반환하는 함수를 작성해보자. 이 함수는 아래와 같은 타입을 가질 것이다.
 
 ```haskell
 allFiles :: Path -> Array Path
 ```
 
-We can define this function by recursion. First, we can use `ls` to enumerate the immediate children of the directory. For each child, we can recursively apply `allFiles`, which will return an array of paths. `concatMap` will allow us to apply `allFiles` and flatten the results at the same time.
+이 함수는 재귀로 구현할 수 있다. 먼저 `ls`로 현재 디렉터리에 직접 포함된 자식들을 나열할 수 있다. 각 자식 항목에 대해 재귀적으로 `allFiles`를 적용한다.
+재귀 호출의 결과는 패스의 배열이므로 `concatMap`을 사용하여 `allFiles`를 적용하면서 동시에 그 결과를 납작하게 펼칠 수 있다.
 
-Finally, we use the cons operator `:` to include the current file:
+마지막으로 `:` 연산자를 이용하여 현재 파일을 결과에 포함시킨다.
 
 ```haskell
 allFiles file = file : concatMap allFiles (ls file)
 ```
 
-_Note_: the cons operator `:` actually has poor performance on immutable arrays, so it is not recommended in general. Performance can be improved by using other data structures, such as linked lists and sequences.
+**주의**: `:` 연산자("cons"라고 읽는다)는 불변 배열에 대해 성능이 매우 나쁘기 때문에 일반적으로는 잘 사용하지 않는다. 성능을 개선하려면 연결 리스트나 시퀀스 같은 다른 자료 구조를 사용하면 된다.
 
-Let's try this function in PSCi:
+PSCi에서 이 함수를 테스트해보자.
 
 ```text
 > import FileOperations
@@ -638,11 +648,12 @@ Let's try this function in PSCi:
 [/,/bin/,/bin/cp,/bin/ls,/bin/mv,/etc/,/etc/hosts, ...]
 ```
 
-Great! Now let's see if we can write this function using an array comprehension using do notation.
+좋다. 일단 결과가 잘 나오는 것은 확인했다. 이제 이 함수를 do 표기법을 사용하여 배열 다루기로 구현할 수 있는지 살펴보자.
 
-Recall that a backwards arrow corresponds to choosing an element from an array. The first step is to choose an element from the immediate children of the argument. Then we simply call the function recursively for that file. Since we are using do notation, there is an implicit call to `concatMap` which concatenates all of the recursive results.
+역화살표를 사용하여 배열에서 요소를 하나씩 추출할 수 있었다는 걸 기억하자. 첫 단계는 인자로 전달받은 경로의 직접 자식들을 하나씩 꺼낸다.
+자식 파일에 대해 재귀 호출한다. do 표기법에서는 `concatMap`을 가정하고 있기 때문에 재귀 호출의 결과는 자동으로 모두 연결된다.
 
-Here is the new version:
+이렇게 새로 구현한 함수는 다음과 같다.
 
 ```haskell
 allFiles' :: Path -> Array Path
@@ -651,24 +662,24 @@ allFiles' file = file : do
   allFiles' child
 ```
 
-Try out the new version in PSCi - you should get the same result. I'll let you decide which version you find clearer.
+새 구현도 PSCi에서 테스트해보자. 이전 버전과 같은 결과가 나와야 한다. 둘 중에서 어느 구현이 더 깔끔한지는 여러분의 판단에 맡긴다.
 
-X> ## Exercises
-X>
-X> 1. (Easy) Write a function `onlyFiles` which returns all _files_ (not directories) in all subdirectories of a directory.
-X> 1. (Medium) Write a fold to determine the largest and smallest files in the filesystem.
-X> 1. (Difficult) Write a function `whereIs` to search for a file by name. The function should return a value of type `Maybe Path`, indicating the directory containing the file, if it exists. It should behave as follows:
-X>
-X>     ```text
-X>     > whereIs "/bin/ls"
-X>     Just (/bin/)
-X>     
-X>     > whereIs "/bin/cat"
-X>     Nothing
-X>     ```
-X>
-X>     _Hint_: Try to write this function as an array comprehension using do notation.
+> ## 연습 문제
+>
+> 1. (쉬움) 어떤 디렉터리의 모든 자식들 중에서 디렉터리를 제외한 모든 파일을 반환하는 `onlyFiles` 함수를 작성해보라.
+> 1. (보통) fold를 써서 파일 시스템 전체 중 가장 큰 파일과 가장 작은 파일을 찾아보라.
+> 1. (어려움) 이름으로 파일을 찾아주는 `whereIs` 함수를 작성해보라. 그 이름의 파일이 있는 경우 파일을 포함하는 디렉터리를 반환하기 위해 `Maybe Path` 타입을 반환해야 한다. 아래처럼 동작하면 된다.
+>
+>     ```text
+>     > whereIs "/bin/ls"
+>     Just (/bin/)
+>
+>     > whereIs "/bin/cat"
+>     Nothing
+>     ```
+>
+>     **힌트**: do 표기법을 이용하여 배열 다루기로 구현할 수 있다.
 
-## Conclusion
+## 결론
 
-In this chapter, we covered the basics of recursion in PureScript, as a means of expressing algorithms concisely. We also introduced user-defined infix operators, standard functions on arrays such as maps, filters and folds, and array comprehensions which combine these ideas. Finally, we showed the importance of using tail recursion in order to avoid stack overflow errors, and how to use accumulator parameters to convert functions to tail recursive form.
+이 장에서는 PureScript에서의 재귀에 대해 기본적인 내용들을 살펴봤다. 재귀는 알고리즘을 간결하게 표현할 수 있는 수단이다. 사용자가 직접 정의하는 중위 연산자를 비롯하여 `map`, `filter`, `fold`와 같은 표준 함수들, 그리고 이 함수들을 모두 종합하는 배열 다루기 등도 살펴봤다. 마지막으로 스택 오버플로 에러를 회피하기 위한 꼬리 재귀의 중요성을 짚어봤고, 누적값 파라미터를 이용하여 꼬리 재귀 함수로 만드는 방법도 살펴봤다.
