@@ -28,7 +28,7 @@ $ purs
 
 Other options for installing the PureScript compiler include:
 
-- Via NPM: `npm install -g PureScript`.
+- Via NPM: `npm install -g purescript`.
 - Building the compiler from source. Instructions can be found on the PureScript website.
 
 ## Installing Tools
@@ -213,10 +213,10 @@ $ pulp run
 
 The PureScript compiler also ships with an interactive REPL called PSCi. This can be very useful for testing your code, and experimenting with new ideas. Let's use PSCi to test the `diagonal` function.
 
-Pulp can load source modules into PSCi automatically, via the `pulp psci` command:
+Pulp can load source modules into PSCi automatically, via the `pulp repl` command:
 
 ```text
-$ pulp psci
+$ pulp repl
 >
 ```
 

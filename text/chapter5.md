@@ -506,11 +506,11 @@ showPicture :: Picture -> Array String
 showPicture = map showShape
 ```
 
-Let's try it out. Compile your module with `pulp build` and open PSCi with `pulp psci`:
+Let's try it out. Compile your module with `pulp build` and open PSCi with `pulp repl`:
 
 ```text
 $ pulp build
-$ pulp psci
+$ pulp repl
 
 > import Data.Picture
 

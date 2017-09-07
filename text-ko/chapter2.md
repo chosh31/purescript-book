@@ -28,7 +28,7 @@ $ purs
 
 컴파일러를 설치하는 다른 방법도 있다.
 
-- npm 이용: `npm install -g PureScript`.
+- npm 이용: `npm install -g purescript`.
 - 소스로 직접 빌드하기. PureScript 웹사이트에 방법이 설명되어 있다.
 
 ## 도구들 설치하기
@@ -107,7 +107,7 @@ $ pulp browserify
 * Browserifying...
 ```
 
-위 명령의 실행 결과로 많은 양의 JavaScript 코드가 출력될 것이다. 이 출력 결과는 
+위 명령의 실행 결과로 많은 양의 JavaScript 코드가 출력될 것이다. 이 출력 결과는
 [Browserify](http://browserify.org/)가 출력하는 내용이다. Browserify는  _Prelude_라고 하는 PureScript의 표준 라이브러리를 포함하여 `src` 디렉토리 내용을 변환한다.
 이렇게 생성된 JavaScript 코드를 파일에 저장하거나 HTML 문서에 포함시킬 수 있다.
 이 프로그램의 경우에는 브라우저 콘솔에 "Hello, World!"를 출력할 것이다.
@@ -203,7 +203,7 @@ diagonal w h = sqrt (w * w + h * h)
 
 방금 작성한 함수에 타입을 정의할 필요가 없다. 컴파일러가 `diagonal` 함수의 정의로부터
 두 개의 수를 입력받아 다시 수를 반환한다는 사실을 유추해 낼 수 있기 때문이다.
-하지만 문서화라는 측면에서 타입 정의를 덧붙이는 것이 좋은 습관이다. 
+하지만 문서화라는 측면에서 타입 정의를 덧붙이는 것이 좋은 습관이다.
 
 이제 `main` 함수를 수정하여 방금 작성한 `diagonal` 함수를 사용해보자.
 

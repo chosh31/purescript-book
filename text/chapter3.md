@@ -43,7 +43,7 @@ $ pulp build
 PureScript defines three built-in types which correspond to JavaScript's primitive types: numbers, strings and booleans. These are defined in the `Prim` module, which is implicitly imported by every module. They are called `Number`, `String`, and `Boolean`, respectively, and you can see them in PSCi by using the `:type` command to print the types of some simple values:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > :type 1.0
 Number
@@ -337,7 +337,7 @@ $ pulp build
 Next, load PSCi, and use the `import` command to import your new module:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Data.AddressBook
 ```
@@ -387,7 +387,7 @@ We don't modify the existing `AddressBook` directly. Instead, we return a new `A
 To implement `insertEntry`, we can use the `Cons` function from `Data.List`. To see its type, open PSCi and use the `:type` command:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Data.List
 > :type Cons
@@ -489,7 +489,7 @@ We can first filter the address book, keeping only those entries with the correc
 With this high-level specification of our approach, we can calculate the type of our function. First open PSCi, and find the types of the `filter` and `head` functions:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Data.List
 > :type filter
@@ -614,7 +614,7 @@ I will let you make your own decision which definition is easier to understand, 
 Now that we have the core of a working application, let's try it out using PSCi.
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Data.AddressBook
 ```

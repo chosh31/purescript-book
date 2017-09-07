@@ -366,7 +366,7 @@ Let's see an example. The monad transformer version of the `State` monad is `Sta
 ```text
 > import Control.Monad.State.Trans
 > :kind StateT
-* -> (* -> *) -> * -> *
+Type -> (Type -> Type) -> Type -> Type
 ```
 
 This looks quite confusing, but we can apply `StateT` one argument at a time to understand how to use it.
@@ -375,24 +375,24 @@ The first type argument is the type of the state we wish to use, as was the case
 
 ```text
 > :kind StateT String
-(* -> *) -> * -> *
+(Type -> Type) -> Type -> Type
 ```
 
-The next argument is a type constructor of kind `* -> *`. It represents the underlying monad, which we want to add the effects of `StateT` to. For the sake of an example, let's choose the `Either String` monad:
+The next argument is a type constructor of kind `Type -> Type`. It represents the underlying monad, which we want to add the effects of `StateT` to. For the sake of an example, let's choose the `Either String` monad:
 
 ```text
 > :kind StateT String (Either String)
-* -> *
+Type -> Type
 ```
 
 We are left with a type constructor. The final argument represents the return type, and we might instantiate it to `Number` for example:
 
 ```text
 > :kind StateT String (Either String) Number
-*
+Type
 ```
 
-Finally we are left with something of kind `*`, which means we can try to find values of this type.
+Finally we are left with something of kind `Type`, which means we can try to find values of this type.
 
 The monad we have constructed - `StateT String (Either String)` - represents computations which can fail with an error, and which can use mutable state.
 
@@ -909,7 +909,7 @@ The front-end of our application is defined by a function `runGame`, with the fo
 runGame
   :: forall eff
    . GameEnvironment
-  -> Eff ( err :: EXCEPTION
+  -> Eff ( exception :: EXCEPTION
          , readline :: RL.READLINE
          , console :: CONSOLE
          | eff
@@ -949,7 +949,7 @@ In our case, we are interested in implementing the line handler function. Our li
 lineHandler
   :: GameState
   -> String
-  -> Eff ( err :: EXCEPTION
+  -> Eff ( exception :: EXCEPTION
          , console :: CONSOLE
          , readline :: RL.READLINE
          | eff
@@ -994,8 +994,8 @@ The final piece of the application is responsible for parsing command line optio
 ```haskell
 runY :: forall a eff.
           YargsSetup ->
-          Y (Eff (err :: EXCEPTION, console :: CONSOLE | eff) a) ->
-             Eff (err :: EXCEPTION, console :: CONSOLE | eff) a
+          Y (Eff (exception :: EXCEPTION, console :: CONSOLE | eff) a) ->
+             Eff (exception :: EXCEPTION, console :: CONSOLE | eff) a
 ```
 
 This is best illustrated by example. The application's `main` function is defined using `runY` as follows:

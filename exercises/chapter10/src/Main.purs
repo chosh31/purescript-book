@@ -1,8 +1,7 @@
 module Main where
 
 import Prelude
-import React.DOM as D
-import React.DOM.Props as P
+
 import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Alert (ALERT, alert)
 import Control.Monad.Eff.Console (CONSOLE, log)
@@ -20,16 +19,17 @@ import Data.Array ((..), length, modifyAt, zipWith)
 import Data.Either (Either(..))
 import Data.Foldable (foldMap, for_)
 import Data.Foreign (ForeignError, readNullOrUndefined, readString, renderForeignError, toForeign)
-import Data.Foreign.Class (class Decode)
-import Data.Foreign.Generic (decodeJSON, defaultOptions, genericDecode, genericDecodeJSON)
+import Data.Foreign.Class (class Decode, class Encode)
+import Data.Foreign.Generic (decodeJSON, defaultOptions, encodeJSON, genericDecode, genericEncode)
 import Data.Foreign.Index (index)
 import Data.Generic.Rep (class Generic)
-import Data.JSON (stringify)
 import Data.List.NonEmpty (NonEmptyList)
 import Data.Maybe (Maybe(..), fromJust, fromMaybe)
 import Data.Traversable (traverse)
 import Partial.Unsafe (unsafePartial)
 import React (ReactClass, ReadWrite, ReactState, Event, ReactThis, createFactory, readState, spec, createClass, writeState)
+import React.DOM as D
+import React.DOM.Props as P
 import ReactDOM (render)
 
 newtype AppState = AppState
@@ -69,6 +69,9 @@ derive instance genericFormData :: Generic FormData _
 
 instance decodeFormData :: Decode FormData where
   decode = genericDecode (defaultOptions { unwrapSingleConstructors = true })
+
+instance encodeFormData :: Encode FormData where
+  encode = genericEncode (defaultOptions { unwrapSingleConstructors = true })
 
 toFormData :: Partial => Person -> FormData
 toFormData (Person p@{ homeAddress: Address a
@@ -122,7 +125,7 @@ validateAndSaveEntry person = do
   case validatePerson' person of
     Left errs -> alert $ "There are " <> show (length errs) <> " validation errors."
     Right result -> do
-      setItem "person" $ stringify $ toForeign $ unsafePartial toFormData result
+      setItem "person" $ encodeJSON $ unsafePartial toFormData result
       alert "Saved"
 
 valueOf :: Event -> Either (NonEmptyList ForeignError) String

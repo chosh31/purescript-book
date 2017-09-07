@@ -91,7 +91,7 @@ When we cover _type classes_ later in the book we will see that the `map` functi
 Let's try out the `map` function in PSCi:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Prelude
 > map (\n -> n + 1) [1, 2, 3, 4, 5]
@@ -549,7 +549,7 @@ X>
 X>     ```haskell
 X>     import Prelude
 X>     import Data.Array.Partial (head, tail)
-X>     
+X>
 X>     count :: forall a. (a -> Boolean) -> Array a -> Int
 X>     count _ [] = 0
 X>     count p xs = if p (unsafePartial head xs)
@@ -589,7 +589,7 @@ isDirectory :: Path -> Boolean
 We can try out the API in PSCi:
 
 ```text
-$ pulp psci
+$ pulp repl
 
 > import Data.Path
 
@@ -658,7 +658,7 @@ X>
 X>     ```text
 X>     > whereIs "/bin/ls"
 X>     Just (/bin/)
-X>     
+X>
 X>     > whereIs "/bin/cat"
 X>     Nothing
 X>     ```
