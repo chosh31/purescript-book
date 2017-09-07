@@ -409,10 +409,9 @@ data List a = Nil | Cons a (List a)
 
 ## ADT 사용하기
 
+ADT의 생성자를 이용하여 값을 만드는 건 정말 간단하다. 일반 함수처럼 필요한 인자들에 적용하기만 하면 된다.
 
-It is simple enough to use the constructors of an algebraic data type to construct a value: simply apply them like functions, providing arguments corresponding to the data included with the appropriate constructor.
-
-For example, the `Line` constructor defined above required two `Point`s, so to construct a `Shape` using the `Line` constructor, we have to provide two arguments of type `Point`:
+예를 들어 위에서 `Line` 생성자가 `Point` 값 두 개를 받는 것으로 정의되어 있으므로 이 `Line` 생성자로 `Shape` 타입의 값을 만들고자 하면 `Point` 타입의 값 두 개를 인자로 전달해야 한다.
 
 ```haskell
 exampleLine :: Shape
@@ -425,11 +424,11 @@ exampleLine = Line p1 p2
     p2 = Point { x: 100.0, y: 50.0 }
 ```
 
-To construct the points `p1` and `p2`, we apply the `Point` constructor to its single argument, which is a record.
+`p1`과 `p2` 두 개의 점을 만들기 위해 `Point` 생성자를 이용했고, 각 `Point` 생성자 호출에는 레코드 값 하나를 인자로 전달했다.
 
-So, constructing values of algebraic data types is simple, but how do we use them? This is where the important connection with pattern matching appears: the only way to consume a value of an algebraic data type is to use a pattern to match its constructor.
+ADT 값을 생성하기 쉽다는 것은 알았고, 그럼 이제 그 값들을 어떻게 사용하는지 살펴보자. ADT와 패턴 매칭의 중요한 연결 고리가 등장하게 된다. ADT 값을 사용하기 위한 유일한 방법이 바로 생성자를 이용한 패턴 매칭이다.
 
-Let's see an example. Suppose we want to convert a `Shape` into a `String`. We have to use pattern matching to discover which constructor was used to construct the `Shape`. We can do this as follows:
+예를 살펴보자. `Shape`를 `String`으로 변환하려고 한다. 그러기 위해서는 `Shape`를 생성하는 데 사용한 생성자가 무엇인지 패턴 매칭을 이용하여 찾아내야 한다. 아래처럼 할 수 있다.
 
 ```haskell
 showPoint :: Point -> String
@@ -443,22 +442,22 @@ showShape (Line start end)  = ...
 showShape (Text p text) = ...
 ```
 
-Each constructor can be used as a pattern, and the arguments to the constructor can themselves be bound using patterns of their own. Consider the first case of `showShape`: if the `Shape` matches the `Circle` constructor, then we bring the arguments of `Circle` (center and radius) into scope using two variable patterns, `c` and `r`. The other cases are similar.
+각 생성자를 패턴으로 사용할 수 있으며 생성자에 전달한 인자들 역시 패턴을 사용하여 이름에 바인딩할 수 있다. `showShape` 함수의 첫 번째 케이스를 보자. 만약 `Shape` 값이 `Circle` 생성자에 매치된다면 `Circle` 생성자의 인자들(중심과 반지름)을 `c`와 `r`이란 이름으로 사용할 수 있다. 다른 케이스들도 마찬가지다.
 
-`showPoint` is another example of pattern matching. In this case, there is only a single case, but we use a nested pattern to match the fields of the record contained inside the `Point` constructor.
+`showPoint` 함수도 패턴 매칭 사례를 보여준다. 여기서는 케이스가 하나뿐이지만 패턴이 중첩되어 `Point` 생성자 패턴 내부에 레코드 패턴으로 필드 값들을 매치할 수 있다.
 
-## Record Puns
+## 레코드 이름 재사용
 
-The `showPoint` function matches a record inside its argument, binding the `x` and `y` properties to values with the same names. In PureScript, we can simplify this sort of pattern match as follows:
+`showPoint` 함수는 레코드 패턴을 매치시키며 `x`와 `y` 필드를 같은 이름으로 바인딩한다. PureScript에서는 이런 식의 패턴 매칭을 간결하게 작성할 수 있다.
 
 ```haskell
 showPoint :: Point -> String
 showPoint (Point { x, y }) = ...
 ```
 
-Here, we only specify the names of the properties, and we do not need to specify the names of the values we want to introduce. This is called a _record pun_.
+레코드 필드의 이름만 지정하고 바인딩할 이름은 따로 지정할 필요가 없다. 이를 **레코드 이름 재사용(record pun)**이라고 부른다.
 
-It is also possible to use record puns to _construct_ records. For example, if we have values named `x` and `y` in scope, we can construct a `Point` using `Point { x, y }`:
+레코드 이름 재사용은 레코드를 **생성**하는 경우에도 사용할 수 있다. 예를 들어 이미 `x`와 `y`란 이름이 현재 스코프에 있을 때 `Point { x, y }` 형식으로 `Point`를 생성할 수 있다.
 
 ```haskell
 origin :: Point
@@ -468,49 +467,49 @@ origin = Point { x, y }
     y = 0.0
 ```
 
-This can be useful for improving readability of code in some circumstances.
+이 방법을 적절히 사용하면 코드 가독성을 향상시킬 수 있다.
 
-X> ## Exercises
-X>
-X> 1. (Easy) Construct a value of type `Shape` which represents a circle centered at the origin with radius `10.0`.
-X> 1. (Medium) Write a function from `Shape`s to `Shape`s, which scales its argument by a factor of `2.0`, center the origin.
-X> 1. (Medium) Write a function which extracts the text from a `Shape`. It should return `Maybe String`, and use the `Nothing` constructor if the input is not constructed using `Text`.
+> ## 연습 문제
+>
+> 1. (쉬움) 중심이 원점이고 반지름이 `10.0`인 원을 나타내는 `Shape` 값을 생성해보라.
+> 1. (보통) 원점을 기준으로 하여 `2.0` 배율로 확대하는 함수를 작성해보라. (`Shape`를 인자로 받고 `Shape`를 반환한다.)
+> 1. (보통) `Shape`에서 문자열을 추출하는 함수를 작성해보라. 결과 타입을 `Maybe String`으로 하여 만약 `Text` 생성자로 만들어진 값이 아닌 경우에는 `Nothing`을 반환해야 한다.
 
-## Newtypes
+## 뉴타입
 
-There is an important special case of algebraic data types, called _newtypes_. Newtypes are introduced using the `newtype` keyword instead of the `data` keyword.
+ADT 중에서도 특별하고 중요한 경우로 **뉴타입(newtype)**이라 불리는 것이 있다. 뉴타입은 `newtype` 키워드로 만들어진다.
 
-Newtypes must define _exactly one_ constructor, and that constructor must take _exactly one_ argument. That is, a newtype gives a new name to an existing type. In fact, the values of a newtype have the same runtime representation as the underlying type. They are, however, distinct from the point of view of the type system. This gives an extra layer of type safety.
+뉴타입은 생성자가 **오직 하나**뿐이고, 그 생성자의 인자 역사 **오직 하나**뿐이어야 한다. 말하자면 뉴타입은 기존 타입에 새로운 이름을 부여하는 것과 같다. 실제로 뉴타입으로 만들어진 값은 런타임에 기존 타입과 완전히 똑같이 표현된다. 뉴타입은 타입 시스템 관점에서만 다르게 인식될 뿐이다. 타입 안전성을 위한 추가적 계층을 제공하기 위한 것이다.
 
-As an example, we might want to define newtypes as type-level aliases for `Number`, to ascribe units like pixels and inches:
+예를 들어 `Number`에 대한 타입 수준의 별칭을 뉴타입으로 정의할 수 있다. 픽셀이나 인치같은 단위를 그렇게 만들 수 있다.
 
 ```haskell
 newtype Pixels = Pixels Number
 newtype Inches = Inches Number
 ```
 
-This way, it is impossible to pass a value of type `Pixels` to a function which expects `Inches`, but there is no runtime performance overhead.
+이제 `Pixels` 타입의 값을 `Inches` 타입을 인자로 받는 함수에 전달하는 것은 불가능하다. 하지만 `Pixels` 타입의 값은 여전히 `Number`와 똑같이 표현되므로 런타임에 발생하는 오버헤드가 전혀 없다.
 
-Newtypes will become important when we cover _type classes_ in the next chapter, since they allow us to attach different behavior to a type without changing its representation at runtime.
+뉴타입은 다음 장에서 **타입 클래스(type class)**를 사용하게 될 때 중요성이 더 부각된다. 런타임에 어떤 부담도 주지 않으면서 타입에 다른 동작을 덧붙일 수 있기 때문이다.
 
-## A Library for Vector Graphics
+## 벡터 그래픽 라이브러리
 
-Let's use the data types we have defined above to create a simple library for using vector graphics.
+이제 앞에서 정의한 타입들을 이용하여 벡터 그래픽 라이브러리를 만들어보자.
 
-Define a type synonym for a `Picture` - just an array of `Shape`s:
+`Shape`의 배열에는 `Picture`라는 타입 별칭을 부여한다.
 
 ```haskell
 type Picture = Array Shape
 ```
 
-For debugging purposes, we'll want to be able to turn a `Picture` into something readable. The `showPicture` function lets us do that:
+디버깅을 쉽게 하기 위해 `Picture`를 문자열로 출력해주는 `showPicture` 함수를 정의하자.
 
 ```haskell
 showPicture :: Picture -> Array String
 showPicture = map showShape
 ```
 
-Let's try it out. Compile your module with `pulp build` and open PSCi with `pulp psci`:
+`pulp build` 명령으로 모듈을 컴파일한 다음 `pulp repl`로 PSCi를 띄워 작업한 내용을 확인해보자.
 
 ```text
 $ pulp build
@@ -528,11 +527,11 @@ $ pulp psci
 ["Line [start: (0.0, 0.0), end: (1.0, 1.0)]"]
 ```
 
-## Computing Bounding Rectangles
+## 감싸는 사각형 계산하기
 
-The example code for this module contains a function `bounds` which computes the smallest bounding rectangle for a `Picture`.
+이 모듈의 예제 코드에 포함된 `bounds` 함수는 `Picture`를 입력으로 받아 전체를 감싸는 가장 작은 사각형을 계산한다.
 
-The `Bounds` data type defines a bounding rectangle. It is also defined as an algebraic data type with a single constructor:
+`Bounds` 타입은 이러한 감싸는 사각형을 나타내며, 생성자가 하나인 ADT로 정의되어 있다.
 
 ```haskell
 data Bounds = Bounds
@@ -543,7 +542,7 @@ data Bounds = Bounds
   }
 ```
 
-`bounds` uses the `foldl` function from `Data.Foldable` to traverse the array of `Shapes` in a `Picture`, and accumulate the smallest bounding rectangle:
+`bounds`는 `Data.Foldable` 모듈의 `foldl` 함수를 이용하여 `Shape` 배열(`Picture`)의 값들을 하나씩 처리함으로써 전체를 감싸는 가장 작은 사각형을 찾아낸다.
 
 ```haskell
 bounds :: Picture -> Bounds
@@ -553,16 +552,16 @@ bounds = foldl combine emptyBounds
     combine b shape = union (shapeBounds shape) b
 ```
 
-In the base case, we need to find the smallest bounding rectangle of an empty `Picture`, and the empty bounding rectangle defined by `emptyBounds` suffices.
+`fold` 함수의 기본 케이스에 해당하는 `emptyBounds`는 비어있는 감싸기 사각형을 나타내기 위해 정의된 것이다. `Picture`가 비어있는 배열인 경우, 이를 감싸는 사각형으로 사용된다.
 
-The accumulating function `combine` is defined in a `where` block. `combine` takes a bounding rectangle computed from `foldl`'s recursive call, and the next `Shape` in the array, and uses the `union` function to compute the union of the two bounding rectangles. The `shapeBounds` function computes the bounds of a single shape using pattern matching.
+누적 함수로 사용된 `combine`은 `where` 절에 정의되어 있다. `combine` 함수는 `foldl`의 재귀 호출로 계산된 감싸기 사각형과 배열의 다음 요소 `Shape`를 인자로 받는다. 먼저 `Shape`의 감싸기 사각형을 `shapeBounds`로 계산한 다음 두 개의 감싸기 사각형을 `union`으로 합친다. `shapeBounds` 함수는 각 `Shape`을 감싸는 사각형을 계산하기 위해 패턴 매칭을 사용한다.
 
-X> ## Exercises
-X>
-X> 1. (Medium) Extend the vector graphics library with a new operation `area` which computes the area of a `Shape`. For the purposes of this exercise, the area of a piece of text is assumed to be zero.
-X> 1. (Difficult) Extend the `Shape` type with a new data constructor `Clipped`, which clips another `Picture` to a rectangle. Extend the `shapeBounds` function to compute the bounds of a clipped picture. Note that this makes `Shape` into a recursive data type.
+> ## 연습 문제
+>
+> 1. (보통) 벡터 그래픽 라이브러리에 `area` 함수를 추가해보라. 이 함수는 각 `Shape`의 면적을 계산한다. 연습 문제에서는 `Text` 모양에 대해 면적을 0이라고 가정한다.
+> 1. (어려움) `Shape` 타입에 `Clipped` 생성자를 추가해보라. `Clipped` 생성자는 `Picture`를 특정 사각형으로 클리핑(사각형 외부를 잘라냄)한 도형을 나타낸다. `shapeBounds` 함수를 수정하여 `Clipped` 값을 처리할 수 있게 하라. 이 생성자를 통해 `Shape`이 재귀 자료 구조가 되었다.
 
-## Conclusion
+## 결론
 
 In this chapter, we covered pattern matching, a basic but powerful technique from functional programming. We saw how to use simple patterns as well as array and record patterns to match parts of deep data structures.
 
