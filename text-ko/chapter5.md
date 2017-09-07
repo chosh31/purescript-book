@@ -248,9 +248,9 @@ sortPair arr = arr
 
 ## `case` 표현식
 
-Patterns do not only appear in top-level function declarations. It is possible to use patterns to match on an intermediate value in a computation, using a `case` expression. Case expressions provide a similar type of utility to anonymous functions: it is not always desirable to give a name to a function, and a `case` expression allows us to avoid naming a function just because we want to use a pattern.
+패턴이 최상위 함수 선언에만 사용되는 것은 아니다. 계산 과정의 중간 값에 대해서도 `case` 표현식을 사용하여 패턴 매칭을 할 수 있다. 익명 함수가 가능하기 때문에 매번 이름을 지정하여 최상위 함수를 만들지 않아도 되는 것처럼 `case` 표현식을 이용하면 패턴을 사용할 수 있기 때문에 패턴 매칭을 사용할 목적 때문이라면 굳이 최상위 함수를 따로 만들 필요는 없다.
 
-Here is an example. This function computes "longest zero suffix" of an array (the longest suffix which sums to zero):
+`case`를 사용하는 예를 살펴보자. 배열에서 "합이 0인 가장 긴 꼬리(longest zero suffix)"를 찾는 함수이다.
 
 ```haskell
 import Data.Array.Partial (tail)
@@ -263,7 +263,7 @@ lzs xs = case sum xs of
            _ -> lzs (unsafePartial tail xs)
 ```
 
-For example:
+다음 처럼 사용할 수 있다.
 
 ```text
 > lzs [1, 2, 3, 4]
@@ -273,13 +273,13 @@ For example:
 [-1, -2, 3]
 ```
 
-This function works by case analysis. If the array is empty, our only option is to return an empty array. If the array is non-empty, we first use a `case` expression to split into two cases. If the sum of the array is zero, we return the whole array. If not, we recurse on the tail of the array.
+이 함수는 두 가지 형태의 케이스 분석으로 동작한다. 먼저 배열이 비어있다면 계산 결과는 빈 배열 그대로가 되며 이를 반환한다. 비어있지 않다면 `case` 표현식으로 다시 두 가지 경우로 나누어 진행한다. 배열의 합이 0이라면 그 배열 전체를 반환하고, 그렇지 않다면 배열의 꼬리 부분에 대해 재귀적으로 살펴본다.
 
-## Pattern Match Failures and Partial Functions
+## 패턴 매칭 실패와 부분 함수
 
-If patterns in a case expression are tried in order, then what happens in the case when none of the patterns in a case alternatives match their inputs? In this case, the case expression will fail at runtime with a _pattern match failure_.
+`case` 표현식의 패턴들을 순서대로 적용시켰는데 어떤 패턴도 입력과 맞아떨어지지 않는다면 어떻게 될까? 이러한 경우 `case` 표현식은 **패턴 매칭 실패** 런타임 오류를 발생시킨다.
 
-We can see this behavior with a simple example:
+이러한 실패 동작은 쉽게 살펴볼 수 있다.
 
 ```haskell
 import Partial.Unsafe (unsafePartial)
@@ -288,7 +288,7 @@ partialFunction :: Boolean -> Boolean
 partialFunction = unsafePartial \true -> true
 ```
 
-This function contains only a single case, which only matches a single input, `true`. If we compile this file, and test in PSCi with any other argument, we will see an error at runtime:
+위 함수는 입력값이 `true`인 경우만 매치된다. 이 파일을 컴파일한 다음 PSCi에서 다른 값을 전달해보면 다음과 같은 런타임 오류를 확인할 수 있다.
 
 ```text
 > partialFunction false
@@ -296,28 +296,29 @@ This function contains only a single case, which only matches a single input, `t
 Failed pattern match
 ```
 
-Functions which return a value for any combination of inputs are called _total_ functions, and functions which do not are called _partial_.
+모든 조합의 입력에 대해 값을 계산하고 반환하는 함수들을 "완전 함수(total function)"라고 하며, 그렇지 않은 함수들을 "부분 함수(partial function)"라고 한다.
 
-It is generally considered better to define total functions where possible. If it is known that a function does not return a result for some valid set of inputs, it is usually better to return a value with type `Maybe a` for some `a`, using `Nothing` to indicate failure. This way, the presence or absence of a value can be indicated in a type-safe way.
+가능하다면 완전 함수로 만드는 것이 더 낫다. 하지만 어떤 함수가 부적절한 입력에 대해 값을 계산해 낼 수 없는 경우라면 `Maybe a` 타입으로 값을 반환하는 편이 더 낫다. 실패하는 경우에 `Nothing`을 반환하면 된다. 값이 있거나 없을 수 있는 상황을 타입으로 잘 드러내는 방법이다.
 
-The PureScript compiler will generate an error if it can detect that your function is not total due to an incomplete pattern match. The `unsafePartial` function can be used to silence these errors (if you are sure that your partial function is safe!) If we removed the call to the `unsafePartial` function above, then `psc` would generate the following error:
+PureScript 컴파일러는 패턴 매치가 불완전하여 완전 함수가 되지 않는다고 확인되는 경우 컴파일 중에 오류를 보여준다. `unsafePartial` 함수는 이런 컴파일 오류를 잠재울 목적으로 사용할 수 있다. (여러분 스스로 그 부분 함수가 안전함을 보장할 수 있어야 한다.) 위 함수 정의에서 `unsafePartial` 호출 부분을 지운다면 `psc` 컴파일러가 아래의 결과를 보여줄 것이다.
 
 ```text
 A case expression could not be determined to cover all inputs.
 The following additional cases are required to cover all inputs:
 
   false
+
 ```
 
-This tells us that the value `false` is not matched by any pattern. In general, these warnings might include multiple unmatched cases.
+`false` 값이 어떤 패턴으로도 매치되지 않는다고 알려준다. 일반적으로는 누락된 경우들을 열거하여 보여준다.
 
-If we also omit the type signature above:
+위 함수 정의에서 타입 정의 부분마저 제거해보자.
 
 ```purescript
 partialFunction true = true
 ```
 
-then PSCi infers a curious type:
+그리고 PSCi를 이용하여 타입 추론 결과를 보면 아래와 같은 특이한 타입을 알려준다.
 
 ```text
 > :type partialFunction
@@ -325,9 +326,11 @@ then PSCi infers a curious type:
 Partial => Boolean -> Boolean
 ```
 
-We will see more types which involve the `=>` symbol later on in the book (they are related to _type classes_), but for now, it suffices to observe that PureScript keeps track of partial functions using the type system, and that we must explicitly tell the type checker when they are safe.
+타입을 표시하면서 사용된 `=>`는 이 책 뒤에서 더 살펴보기로 하고, 일단 여기서는 PureScript가
+어떤 형태로든 타입 시스템을 이용하여 부분 함수를 추적하고 있다는 점만 알아두자.
+따라서 우리는 부분 함수들이 안전하다고 컴파일러에 명시적으로 알려주어야 한다.
 
-The compiler will also generate a warning in certain cases when it can detect that cases are _redundant_ (that is, a case only matches values which would have been matched by a prior case):
+컴파일러는 중복 패턴이 발견되는 경우에 경고를 보여주기도 한다. 순서 상 뒤에 열거된 케이스가 이미 앞의 케이스로 매치되는 경우를 말한다.
 
 ```purescript
 redundantCase :: Boolean -> Boolean
@@ -336,7 +339,7 @@ redundantCase false = false
 redundantCase false = false
 ```
 
-In this case, the last case is correctly identified as redundant:
+컴파일러는 위 코드의 마지막 케이스가 중복되었다고 콕 집어 알려준다.
 
 ```text
 Redundant cases have been detected.
@@ -345,22 +348,21 @@ The definition has the following redundant cases:
   false
 ```
 
-_Note_: PSCi does not show warnings, so to reproduce this example, you will need to
-save this function as a file and compile it using `pulp build`.
+**주의**: PSCi는 경고를 보여주지 않기 때문에 이 예제와 같은 경고를 직접 확인하려면 파일에 함수를 정의한 다음 `pulp build` 명령으로 컴파일해야 한다.
 
-## Algebraic Data Types
+## 대수적 자료형
 
-This section will introduce a feature of the PureScript type system called _Algebraic Data Types_ (or _ADTs_), which are fundamentally related to pattern matching.
+이 절에서는 PureScript 타입 시스템의 기능 중 하나인 **대수적 자료형(Algebraic Data Type, ADT)**를 소개한다. ADT는 패턴 매칭과 깊게 관련되어 있다.
 
-However, we'll first consider a motivating example, which will provide the basis of a solution to this chapter's problem of implementing a simple vector graphics library.
+하지만 먼저 ADT의 유용성을 드러낼만한 사례를 살펴보자. 이 장에서 구현하고자 하는 간단한 벡터 그래픽 라이브러리를 구성하는 기본이 될 것이다.
 
-Suppose we wanted to define a type to represent some simple shape types: lines, rectangles, circles, text, etc. In an object oriented language, we would probably define an interface or abstract class `Shape`, and one concrete subclass for each type of shape that we wanted to be able to work with.
+선분, 직사각형, 원, 텍스트와 같은 간단한 도형들을 나타내는 타입을 정의하려고 한다. 객체지향 언어를 이용한다면 아마도 `Shape`라는 인터페이스나 추상 클래스를 정의한 각 도형에 해당하는 구체 클래스를 정의할 것이다.
 
-However, this approach has one major drawback: to work with `Shape`s abstractly, it is necessary to identify all of the operations one might wish to perform, and to define them on the `Shape` interface. It becomes difficult to add new operations without breaking modularity.
+하지만 이런 접근에는 중대한 결함이 있다. 추상화된 `Shape`를 다루기 위해서는 도형을 가지고 작업하고자 하는 모든 기능들을 미리 식별하여 `Shape` 인터페이스에 정의해야 한다. 그런데 이렇게 하면 나중에 새로운 기능을 추가하고자 할 때 기존 코드를 건드리지 않고 작업하기가 매우 어렵다.
 
-Algebraic data types provide a type-safe way to solve this sort of problem, if the set of shapes is known in advance. It is possible to define new operations on `Shape` in a modular way, and still maintain type-safety.
+사전에 도형의 종류를 모두 알고 있다면 ADT를 이용하여 이러한 문제를 타입에 안전한 방법으로 해결할 수 있다. 나중에 `Shape`에 새로운 기능을 더하고자 할 때에도 기존 코드를 건드리지 않고 쉽게 추가할 수 있다.
 
-Here is how `Shape` might be represented as an algebraic data type:
+ADT를 이용하여 `Shape`를 정의하면 아래와 같다.
 
 ```haskell
 data Shape
@@ -370,7 +372,7 @@ data Shape
   | Text Point String
 ```
 
-The `Point` type might also be defined as an algebraic data type, as follows:
+`Point` 타입 역시 ADT로 정의할 수 있다.
 
 ```haskell
 data Point = Point
@@ -379,33 +381,34 @@ data Point = Point
   }
 ```
 
-The `Point` data type illustrates some interesting points:
+위의 `Point` 데이터 타입 정의를 보면 몇가지 흥미로운 것들이 보인다.
 
-- The data carried by an ADT's constructors doesn't have to be restricted to primitive types: constructors can include records, arrays, or even other ADTs.
-- Even though ADTs are useful for describing data with multiple constructors, they can also be useful when there is only a single constructor.
-- The constructors of an algebraic data type might have the same name as the ADT itself. This is quite common, and it is important not to confuse the `Point` _type constructor_ with the `Point` _data constructor_ - they live in different namespaces.
+- ADT 생성자에 전달되는 데이터는 기본 자료형에 국한되지 않는다. 생성자에 레코드, 배열, 심지어 다른 ADT를 전달할 수도 있다.
+- ADT가 생성자가 여러 개인 경우에 유용하기는 하지만 생성자가 하나인 경우에도 유용하게 쓰일 수 있다.
+- ADT의 생성자는 ADT 이름과 같을 수도 있다. 오히려 매우 일반적이다. 대신 타입 생성자로서의 `Point`와 데이터 생성자로서의 `Point`를 혼동하지 않아야 한다. 이 둘은 서로 다른 이름 공간에 존재한다.
 
-This declaration defines `Shape` as a sum of different constructors, and for each constructor identifies the data that is included. A `Shape` is either a `Circle` which contains a center `Point` and a radius (a number), or a `Rectangle`, or a `Line`, or `Text`. There are no other ways to construct a value of type `Shape`.
+`Shape` 타입은 여러 생성자들의 합으로 정의되고, 각 생성자는 이 타입의 데이터들을 식별하는데 사용된다. 다시 말해 어떤 `Shape` 값은 중심(`Point`)과 반지름(`Number`)으로 정의되는 `Circle`일 수도 있고, `Rectangle`이거나 `Line` 혹은 `Text` 중 하나이다. `Shape` 타입의 값을 생성하는 다른 방법은 없다.
 
-An algebraic data type is introduced using the `data` keyword, followed by the name of the new type and any type arguments. The type's constructors are defined after the equals symbol, and are separated by pipe characters (`|`).
+ADT의 정의는 `data` 키워드와 새 타입의 이름, 그리고 필요하다면 타입 인자들을 열거하는 것으로 시작된다. 등호 뒤에 파이프 문자(`|`)로 구분하여 타입 생성자들을 열거한다.
 
-Let's see another example from PureScript's standard libraries. We saw the `Maybe` type, which is used to to define optional values, earlier in the book. Here is it's definition from the `purescript-maybe` package:
+또다른 예는 PureScript 표준 라이브러리에서 찾아보자. 이미 봤던 `Maybe` 타입은 어떤 값이 있거나 없음을 나타내는데 사용된다. `purescript-maybe` 패키지에 아래와 같이 정의되어 있다.
 
 ```haskell
 data Maybe a = Nothing | Just a
 ```
 
-This example demonstrates the use of a type parameter `a`. Reading the pipe character as the word "or", its definition almost reads like English: "a value of type `Maybe a` is either `Nothing`, or `Just` a value of type `a`".
+타입 파라미터 `a`가 사용되었다. 파이프 문자를 "or" 정도로 읽는다면 위 정의는 거의 영어에 가깝게 읽을 수 있다. "a value of type `Maybe a` is either `Nothing`, or `Just` a value of type `a`".
 
-Data constructors can also be used to define recursive data structures. Here is one more example, defining a data type of singly-linked lists of elements of type `a`:
+데이터 생성자는 재귀적 자료형을 정의하는 데 사용할 수도 있다. `a` 타입의 값들에 대한 단일 연결리스트 자료형의 정의는 다음과 같다.
 
 ```haskell
 data List a = Nil | Cons a (List a)
 ```
 
-This example is taken from the `purescript-lists` package. Here, the `Nil` constructor represents an empty list, and `Cons` is used to create non-empty lists from a head element and a tail. Notice how the tail is defined using the data type `List a`, making this a recursive data type.
+이 정의는 `purescript-lists` 패키지에서 가져온 것이다. 여기서 `Nil` 생성자는 빈 리스트를 나타내고, `Cons` 생성자는 맨 앞 머리 요소와 이어지는 꼬리 리스트로 비어있지 않은 리스트를 생성하기 위해 사용된다. 꼬리 부분을 `List a` 타입으로 지정함으로써 재귀적 자료형이 되었다.
 
-## Using ADTs
+## ADT 사용하기
+
 
 It is simple enough to use the constructors of an algebraic data type to construct a value: simply apply them like functions, providing arguments corresponding to the data included with the appropriate constructor.
 
