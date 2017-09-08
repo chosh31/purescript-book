@@ -563,10 +563,11 @@ bounds = foldl combine emptyBounds
 
 ## 결론
 
-In this chapter, we covered pattern matching, a basic but powerful technique from functional programming. We saw how to use simple patterns as well as array and record patterns to match parts of deep data structures.
+이번 장에서 패턴 매칭을 다뤘다. 패턴 매칭은 함수형 프로그래밍의 기본 기능이면서도 매우 강력하다. 단순한 패턴들과 더불어 배열이나 레코드가 중첩된 복잡한 자료 구조에 대해서도 살펴봤다.
 
-This chapter also introduced algebraic data types, which are closely related to pattern matching. We saw how algebraic data types allow concise descriptions of data structures, and provide a modular way to extend data types with new operations.
+패턴 매칭과 밀접하게 관련되어 있는 대수적 자료형도 소개했다. ADT를 이용하여 자료형을 간결하게 정의할 수 있고 또 여기에 새로운 연산 함수를 쉽게 추가할 수 있었다.
 
-Finally, we covered _row polymorphism_, a powerful type of abstraction which allows many idiomatic JavaScript functions to be given a type. We will see this idea again later in the book.
+**행 다형성**도 다루었다. 행 다형성을 이용하면 인자들의 타입에 대해 느슨한 JavaScript 함수들에도 쉽게 타입을 부여할 수 있다. 이 책 뒤에서 또 보게 될 것이다.
 
-In the rest of the book, we will use ADTs and pattern matching extensively, so it will pay dividends to become familiar with them now. Try creating your own algebraic data types and writing functions to consume them using pattern matching.
+앞으로 보게 될 코드에는 ADT와 패턴 매칭이 많이 사용되기 때문에 지금 익혀둔다면 여러모로 도움이 될 것이다. 여러분 스스로의 ADT를 정의하고 관련 함수들을 정의하면서 패턴 매칭을 사용해보길 바란다.
+
