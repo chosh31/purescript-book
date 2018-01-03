@@ -328,48 +328,48 @@ do 표기법을 사용하면 두 번째 계산식에서 첫 번째 계산식의 
 
 지난 장에서 `Applicative` 타입 클래스가 병렬성을 표현할 수 있다고 했었다. 이것이 가능한 이유는 바로 리프트하는 함수의 인자들이 서로 독립적이기 때문이다. `Monad` 타입 클래스는 앞 계산의 결과를 다음 계산이 사용할 수 있기 때문에 병렬성을 표현할 수 없다. 대신 모나드는 부수 효과를 순차적으로 합성해야 한다.
 
-## 연습 문제
-
-1. (쉬움) `Data.Array` 모듈(`purescript-arrays` 패키지)에서 `head`와 `tail` 함수의 타입을 살펴보고 이들 함수를 이용하여 `third` 함수(배열의 세 번째 요소를 반환)를 작성해보라. do 표기법으로 작성한다. 반환 타입은 `Maybe`일 것이다.
-1. (보통) 동전 묶음이 주어졌을 때 동전들로 만들 수 있는 금액의 모든 경우를 계산하는 함수 `sums`를 `foldM`을 이용하여 작성해보라. 동전 묶음은 각 동전의 금액을 포함하는 배열로 주어진다. PSCi에서 다음처럼 확인할 수 있어야 한다.
-
-    ```
-    > sums []
-    [0]
-    > sums [1, 2, 10]
-    [0,1,2,3,10,11,12,13]
-    ```
-
-    **힌트**: `foldM`을 이용하면 이 함수는 한 줄로 작성할 수 있다. `nub`이나 `sort` 함수를 이용하여 최종 결과에서 중복을 제거하고 정렬하면 된다.
-1. (보통) `Maybe` 모나드에 대해 `ap` 함수와 `apply` 연산자가 올바르게 동작함을 확인해보라.
-1. (보통) `purescript-maybe` 패키지에 정의된 `Maybe` 타입의 `Monad` 인스턴스가 모나드 법칙을 만족하는지 증명해보라.
-1. (보통) 리스트 처리 함수인 `filter`를 일반화하여 `filterM` 함수를 작성해보라. 이 함수의 타입은 다음과 같다.
-
-    ```haskell
-    filterM :: forall m a. Monad m => (a -> m Boolean) -> List a -> m (List a)
-    ```
-
-    `Maybe`와 `Array` 모나드에 대해 이 함수가 잘 동작하는지 PSCi에서 테스트해보라.
-1. (어려움) 모든 모나드는 다음처럼 정의된 `Functor` 인스턴스를 기본으로 가진다.
-
-    ```haskell
-    map f a = do
-      x <- a
-      pure (f x)
-    ```
-
-    모나드 법칙을 이용하여 모든 모나드에 대해 아래의 식이 성립함을 보여라.
-
-    ```haskell
-    lift2 f (pure a) (pure b) = pure (f a b)
-    ```
-
-    이미 살펴본 `ap` 함수로 `Applicative` 인스턴스가 정의되었다. 그리고 `lift2` 함수는 아래처럼 정의되어 있다.
-
-    ```haskell
-    lift2 :: forall f a b c. Applicative f => (a -> b -> c) -> f a -> f b -> f c
-    lift2 f a b = f <$> a <*> b
-    ```
+> ## 연습 문제
+> 
+> 1. (쉬움) `Data.Array` 모듈(`purescript-arrays` 패키지)에서 `head`와 `tail` 함수의 타입을 살펴보고 이들 함수를 이용하여 `third` 함수(배열의 세 번째 요소를 반환)를 작성해보라. do 표기법으로 작성한다. 반환 타입은 `Maybe`일 것이다.
+> 1. (보통) 동전 묶음이 주어졌을 때 동전들로 만들 수 있는 금액의 모든 경우를 계산하는 함수 `sums`를 `foldM`을 이용하여 작성해보라. 동전 묶음은 각 동전의 금액을 포함하는 배열로 주어진다. PSCi에서 다음처럼 확인할 수 있어야 한다.
+> 
+>     ```
+>     > sums []
+>     [0]
+>     > sums [1, 2, 10]
+>     [0,1,2,3,10,11,12,13]
+>     ```
+> 
+>     **힌트**: `foldM`을 이용하면 이 함수는 한 줄로 작성할 수 있다. `nub`이나 `sort` 함수를 이용하여 최종 결과에서 중복을 제거하고 정렬하면 된다.
+> 1. (보통) `Maybe` 모나드에 대해 `ap` 함수와 `apply` 연산자가 올바르게 동작함을 확인해보라.
+> 1. (보통) `purescript-maybe` 패키지에 정의된 `Maybe` 타입의 `Monad` 인스턴스가 모나드 법칙을 만족하는지 증명해보라.
+> 1. (보통) 리스트 처리 함수인 `filter`를 일반화하여 `filterM` 함수를 작성해보라. 이 함수의 타입은 다음과 같다.
+> 
+>     ```haskell
+>     filterM :: forall m a. Monad m => (a -> m Boolean) -> List a -> m (List a)
+>     ```
+> 
+>     `Maybe`와 `Array` 모나드에 대해 이 함수가 잘 동작하는지 PSCi에서 테스트해보라.
+> 1. (어려움) 모든 모나드는 다음처럼 정의된 `Functor` 인스턴스를 기본으로 가진다.
+> 
+>     ```haskell
+>     map f a = do
+>       x <- a
+>       pure (f x)
+>     ```
+> 
+>     모나드 법칙을 이용하여 모든 모나드에 대해 아래의 식이 성립함을 보여라.
+> 
+>     ```haskell
+>     lift2 f (pure a) (pure b) = pure (f a b)
+>     ```
+> 
+>     이미 살펴본 `ap` 함수로 `Applicative` 인스턴스가 정의되었다. 그리고 `lift2` 함수는 아래처럼 정의되어 있다.
+> 
+>     ```haskell
+>     lift2 :: forall f a b c. Applicative f => (a -> b -> c) -> f a -> f b -> f c
+>     lift2 f a b = f <$> a <*> b
+>     ```
 
 ## 네이티브 효과
 
@@ -772,10 +772,15 @@ return ref.x;
 
 `ST` 효과는 가변 상태를 지역적으로 사용하는 경우 짧은 JavaScript 코드를 생성해내는 방법으로 훌륭하다. 특히 `forE`, `foreachE`, `whileE`, `untilE` 등의 액션과 함께 사용하면 효율적인 루프 코드를 생성할 수 있다.
 
-## 연습 문제
-
-1. (보통) `safeDivide` 함수에서 0으로 나누려는 경우에 `throwException`으로 예외를 던지도록 수정해보라.
-1. (어려움) 원주율(π)의 근사값을 계산하는 방법 중 하나다. 한 변의 길이가 1인 정사각형 내부에 무작위로 `N`개의 점을 찍는다. 이 점들 중 정사각형의 내접원 내부에 놓인 점의 갯수를 센다. 이제 `4n/N`으로 π의 근사값을 계산한다. `RANDOM` 효과와 `ST` 효과(그리고 `forE` 함수)를 이용하여 여기서 설명한 방법으로 π의 근사값을 계산하는 함수를 작성해보라.
+> ## 연습 문제
+> 
+> 1. (보통) `safeDivide` 함수에서 0으로 나누려는 경우에 `throwException`으로 예외를 던지도록 수정해보라.
+> 1. (어려움) 원주율(π)의 근사값을 계산하는 방법 중 하나를 구현해보자. 이 방법은 다음과 같다.
+>    1. 한 변의 길이가 1인 정사각형 내부에 무작위로 `N`개의 점을 찍는다. 
+>    1. 이 점들 중 정사각형의 내접원 내부에 놓인 점의 갯수를 센다. 
+>    1. 이제 `4n/N`으로 π의 근사값을 계산한다.
+>
+>    `RANDOM` 효과와 `ST` 효과(그리고 `forE` 함수)를 이용하여 여기서 설명한 방법으로 π의 근사값을 계산하는 함수를 작성해보라.
 
 ## DOM 효과
 
@@ -989,7 +994,7 @@ formField name hint value update =
         ]
 ```
 
-Again, note that we are composing more interesting elements from simpler elements, applying attributes to each element as we go. One attribute of note here is the `onChange` attribute applied to the `input` element. This is an _event handler_, and is used to update the component state when the user edits text in our text box. Our event handler is defined using a third helper function, `updateAppState`:
+이번에도 더 간단한 엘리먼트를 이용하여 더 복잡한 엘리먼트를 만들었다. 각 엘리먼트마다 적절한 속성을 부여했다. 속성 중에서 `input` 엘리먼트에 적용된 `onChange` 속성을 눈여겨 보자. 이 속성은 **이벤트 핸들러**이며, 텍스트 박스의 내용을 사용자가 수정할 때 컴포넌트의 상태를 갱신하기 위해 사용된다. 이벤트 핸들러가 사용하는 세 번째 도움 함수 `updateAppState`를 보자.
 
 ```haskell
 updateAppState
@@ -1003,14 +1008,14 @@ updateAppState
          ) Unit
 ```
 
-`updateAppState` takes a reference to the component in the form of our `ReactThis` value, a function to update the `Person` record, and the `Event` record we are responding to. First, it extracts the new value of the text box from the `change` event (using the `valueOf` helper function), and uses it to create a new `Person` state:
+`updateAppState` 함수는 컴포넌트의 참조를 `ReactThis` 타입의 값으로 받고, 추가로 `Person` 레코드를 수정하는 함수, 그리고 처리하고자 하는 `Event` 레코드를 입력으로 받는다. 이 함수는 먼저 `change` 이벤트에 `valueOf` 도움 함수를 적용하여 텍스트 박스의 입력 내용을 꺼내고, 이 값을 이용하여 새로운 `Person` 상태를 만들어낸다.
 
 ```haskell
   for_ (valueOf e) \s -> do
     let newPerson = update s
 ```
 
-Then, it runs the validation function, and updates the component state (using `writeState`) accordingly:
+그 다음 검사 함수를 실행하여 발견된 오류 항목으로 컴포넌트 상태를 갱신한다. (`writeState` 함수를 이용하면 된다.)
 
 ```haskell
     log "Running validators"
@@ -1025,35 +1030,46 @@ Then, it runs the validation function, and updates the component state (using `w
                                  })
 ```
 
-That covers the basics of our component implementation. However, you should read the source accompanying this chapter in order to get a full understanding of the way the component works.
+여기까지 컴포넌트 구현의 기본을 살펴보았다. 하지만 컴포넌트가 어떻게 동작하는지 완전히 이해하려면 이 장에 딸린 소스 코드를 꼭 읽어봐야 할 것이다.
 
-Also try the user interface out by running `pulp browserify --to dist/Main.js` and then opening the `html/index.html` file in your web browser. You should be able to enter some values into the form fields and see the validation errors printed onto the page.
+그리고 `pulp browserify --to dist/Main.js` 명령을 실행하고 `html/index.html`을 열어서 지금까지 작성한 UI가 동작하는 것을 꼭 확인해보라. 입력 양식에 값을 입력해보고 입력 검사 오류가 페이지에 나오는지도 확인해보라.
 
-Obviously, this user interface can be improved in a number of ways. The exercises will explore some ways in which we can make the application more usable.
+여기서 만든 UI는 여러가지 측면에서 개선할 점이 있다. 이 애플리케이션이 좀더 그럴싸한 모양을 갖추도록 연습 문제를 통해 개선해보자.
 
-> ## Exercises
+> ## 연습 문제
 >
-> 1. (Easy) Modify the application to include a work phone number text box.
-> 1. (보통) Instead of using a `ul` element to show the validation errors in a list, modify the code to create one `div` with the `alert` style for each error.
-> 1. (어려움, Extended) One problem with this user interface is that the validation errors are not displayed next to the form fields they originated from. Modify the code to fix this problem.
+> 1. (쉬움) 직장 전화 번호를 입력하는 텍스트 박스를 추가해보자.
+> 1. (보통) 검사 오류를 `ul` 목록으로 보여주는 대신 각 오류 항목 하나마다 `alert` 스타일을 적용한 `div`로 만들어보자.
+> 1. (어려움, 확장) 여기서 만든 UI가 가진 문제점 중 하나는 입력 내용에서 검출된 오류가 해당 입력 필드 바로 옆에 나타나지 않는다는 점이다. 이 문제를 수정해보라.
 >
-> _Hint_: the error type returned by the validator should be extended to indicate which field caused the error. You might want to use the following modified `Errors` type:
+>     **힌트**: 오류를 반환할 때 문제가 되는 필드 정보가 포함되도록 검사 함수를 확장해야 한다. `Errors` 타입을 수정해야 할 수도 있다.
 >
-> `haskell > data Field = FirstNameField > | LastNameField > | StreetField > | CityField > | StateField > | PhoneField PhoneType > > data ValidationError = ValidationError String Field > > type Errors = Array ValidationError >`
+>     ```haskell
+>     data Field = FirstNameField
+>                | LastNameField
+>                | StreetField
+>                | CityField
+>                | StateField
+>                | PhoneField PhoneType
 >
-> You will need to write a function which extracts the validation error for a particular `Field` from the `Errors` structure.
+>    data ValidationError = ValidationError String Field
+>
+>    type Errors = Array ValidationError
+>    ```
+>
+>    `Errors` 구조에서 오류를 유발한 특정 `Field`를 추출하는 함수를 작성해야 할 것이다.
 
-## Conclusion
+## 결론
 
-This chapter has covered a lot of ideas about handling side-effects in PureScript:
+이 장에서는 PureScript가 부수 효과를 다루는 것과 관련된 여러가지 개념들을 살펴보았다.
 
-* We met the `Monad` type class, and its connection to do notation.
-* We introduced the monad laws, and saw how they allow us to transform code written using do notation.
-* We saw how monads can be used abstractly, to write code which works with different side-effects.
-* We saw how monads are examples of applicative functors, how both allow us to compute with side-effects, and the differences between the two approaches.
-* The concept of native effects was defined, and we met the `Eff` monad, which is used to handle native side-effects.
-* We saw how the `Eff` monad supports extensible effects, and how multiple types of native effect can be interleaved into the same computation.
-* We saw how effects and records are handled in the kind system, and the connection between extensible records and extensible effects.
-* We used the `Eff` monad to handle a variety of effects: random number generation, exceptions, console IO, mutable state, and DOM manipulation using React.
+* `Monad` 타입 클래스를 보았고 이 클래스와 do 표기법이 어떻게 연결되는지도 살펴보았다.
+* 모나드 법칙을 소개했고, do 표기법을 사용하여 이 법칙을 적용했을 때 코드가 어떻게 변형될 수 있는지 보았다.
+* 모나드를 추상적 수준에서 다루면서 여러가지 다른 부수 효과에 대해 동작하는 코드를 작성할 수 있었다.
+* 모나드가 Applicative 펑터의 한 종류이며, 부수 효과를 동반한 계산을 나타낸다는 점은 같지만 접근 방법이 다르다는 것을 살펴봤다.
+* 네이티브 효과라는 개념을 정의했고, `Eff` 모나드를 이용하여 네이티브 부수 효과를 다룰 수 있음을 확인했다.
+* `Eff` 모나드가 어떻게 확장가능한 효과를 지원하는지, 어떻게 같은 계산식 안에서 여러가지 다른 유형의 네이티브 효과를 함께 사용할 수 있는지 살펴봤다.
+* 효과와 레코드가 사실 카인드 시스템에 의해 처리되며 확장가능한 레코드와 확장가능한 효과과 서로 연결되어 있음을 알아봤다.
+* `Eff` 모나드를 이용하여 난수 생성, 예외, 콘솔 IO, 가변 상태, React를 이용한 DOM 조작 등과 같은 다양한 효과를 다루어보았다.
 
-The `Eff` monad is a fundamental tool in real-world PureScript code. It will be used in the rest of the book to handle side-effects in a number of other use-cases.
+`Eff` 모나드는 PureScript로 진짜 프로그램을 작성하고자 할 때 가장 기본이 되는 도구다. 앞으로도 여러가지 다양한 사례에 걸쳐 부수 효과를 처리하기 위해 사용될 것이다.
