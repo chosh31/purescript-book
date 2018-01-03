@@ -931,9 +931,9 @@ writeState
 
 `readState`와 `writeState` 함수는 확장가능한 효과에 `ReactState` 효과를 지정하여 React 상태를 접근한다는 사실을 명시하고 있다. 게다가 세부적인 읽기/쓰기 권한조차 `ReactState` 효과의 인자에 **또다른 행**으로 나타내고 있다.
 
-This illustrates an interesting point about PureScript's row-based effects: effects appearing inside rows need not be simple singletons, but can have interesting structure, and this flexibility enables some useful restrictions at compile time. If the `purescript-react` library did not make this restriction then it would be possible to get exceptions at runtime if we tried to write the state in the `Render` action, for example. Instead, such mistakes are now caught at compile time.
+여기서 행을 이용하는 PureScript 효과 시스템의 특징이 드러난다. 행에 표시되는 효과는 꼭 싱글턴 값일 필요가 없다. 그 대신 좀더 복잡한 구조를 가질 수도 있다. 이러한 유연성 덕분에 컴파일 시점에 여러가지 유용한 제약 사항을 체크할 수 있게 된다. `purescript-react` 라이브러리가 위와 같은 제약을 사용하지 않는다면 `Render` 액션에서 상태를 업데이트하는 코드가 있을 때 실행 시점에 예외를 일으킬 수 밖에 없을 것이다. 하지만 타입 시스템에 표시된 제약 덕분에 이런 실수를 컴파일 시점에 발견할 수 있다.
 
-Now we can read the definition of our `addressBook` component. It starts by reading the current component state:
+`addressBook` 컴포넌트 정의를 이제 읽을 수 있을 것이다. 이 컴포넌트는 먼저 현재 상태를 읽어들인다.
 
 ```haskell
 addressBook = createClass $ spec initialState \ctx -> do
@@ -942,12 +942,12 @@ addressBook = createClass $ spec initialState \ctx -> do
            } <- readState ctx
 ```
 
-Note the following:
+do 블록의 첫 줄이 하는 일을 보자.
 
-* The name `ctx` refers to the `ReactThis` reference, and can be used to read and write the state where appropriate.
-* The record inside `AppState` is matched using a record binder, including a record pun for the _errors_ field. We explicitly name various parts of the state structure for convenience.
+* `ctx`는 `ReactThis` 참조를 가리킨다. 컴포넌트 상태를 읽거나 수정할 때엔 이 값이 필요하다.
+* `AppState` 내의 레코드를 레코드 바인딩 문법으로 매치시킨다. 편의상 상태 구조체의 특정 요소들을 이름붙여 바인딩했다.
 
-Recall that `Render` must return a `ReactElement` structure, representing the intended state of the DOM. The `Render` action is defined in terms of some helper functions. One such helper function is `renderValidationErrors`, which turns the `Errors` structure into an array of `ReactElement`s.
+`Render` 액션은 렌더링 하고자 하는 DOM 상태를 나타내는 `ReactElement` 구조를 반환해야 한다고 했다. `Render` 액션은 몇 개의 도움 함수로 나누어 정의한다. 예를 들면 `Errors` 구조를 `ReactElement` 배열로 변환하는 `renderValidationErrors`를 도움 함수로 만들면 된다.
 
 ```haskell
 renderValidationError :: String -> ReactElement
@@ -961,11 +961,11 @@ renderValidationErrors xs =
   ]
 ```
 
-In `purescript-react`, `ReactElement`s are typically created by applying functions like `div`, which create single HTML elements. These functions usually take an array of attributes, and an array of child elements as arguments. However, names ending with a prime character (like `ul'` here) omit the attribute array, and use the default attributes instead.
+`purescript-react`에서 `ReactElement`는 대부분 `div`처럼 특정 HTML 엘리먼트를 만드는 함수로 만들어진다. 이 함수들은 HTML 엘리먼트의 속성을 나타내는 배열과 자식을 나타내는 배열을 인자로 취한다. 함수 이름 끝에 따옴표("프라임"이라고 한다)가 붙은 함수(`ul'` 같은)는 속성 배열이 생략된 버전이며, 이 경우는 기본 속성 값을 사용한다.
 
-Note that since we are simply manipulating regular data structures here, we can use functions like `map` to build up more interesting elements.
+여기서 생성하는 값들은 보통의 자료 구조라서 `map` 같은 함수를 써서 좀더 복잡한 구조의 엘리먼트를 만들 수도 있다.
 
-A second helper function is `formField`, which creates a `ReactElement` containing a text input for a single form field:
+두 번째로 살펴볼 도움 함수는 `formField`이다. 이 함수는 입력 필드 하나를 나타내기 위해 텍스트 박스 하나를 포함하는 `ReactElement`를 만들어준다.
 
 ```haskell
 formField
