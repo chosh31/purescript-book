@@ -109,9 +109,9 @@ No type class instance was found for
   Data.Show.Show (Int -> Int)
 ```
 
-X> ## 연습 문제
-X>
-X> 1. (쉬움) 앞 장에서 정의한 `showShape` 함수를 이용하여 `Shape` 타입에 대해 `Show` 인스턴스를 정의해보라.
+> ## 연습 문제
+>
+> 1. (쉬움) 앞 장에서 정의한 `showShape` 함수를 이용하여 `Shape` 타입에 대해 `Show` 인스턴스를 정의해보라.
 
 ## 공통 타입 클래스
 
@@ -289,18 +289,18 @@ class Functor f where
 
 표준 타입 클래스 다수가 이런 식의 법칙들을 동반한다. 특정 타입 클래스가 법칙들을 함께 제공한다면 우리는 해당 클래스의 인스턴스들을 좀더 일반화시켜 검토해볼 수 있다. 관심있는 독자들은 이미 살펴본 다른 표준 타입 클래스들에 어떤 법칙들이 수반되는지 확인해보길 바란다.
 
-X> ## 연습 문제
-X>
-X> 1. (쉬움) 아래의 뉴타입 정의는 복소수를 나타낸다.
-X>
-X>     ```haskell
-X>     newtype Complex = Complex
-X>       { real :: Number
-X>       , imaginary :: Number
-X>       }
-X>     ```
-X>
-X>     `Complex` 타입에 대해 `Show`와 `Eq` 인스턴스를 정의해보라.
+> ## 연습 문제
+>
+> 1. (쉬움) 아래의 뉴타입 정의는 복소수를 나타낸다.
+>
+>     ```haskell
+>     newtype Complex = Complex
+>       { real :: Number
+>       , imaginary :: Number
+>       }
+>     ```
+>
+>     `Complex` 타입에 대해 `Show`와 `Eq` 인스턴스를 정의해보라.
 
 ## 타입 지정
 
@@ -397,37 +397,37 @@ instance showEither :: (Show a, Show b) => Show (Either a b) where
 
 프로그램이 컴파일 될 때 `show` 함수 인자의 타입을 추론하고 그 타입으로 `Show` 타입 클래스에 대한 올바른 인스턴스가 선택된다. 선택된 인스턴스는 인스턴스들의 복잡한 관계에 의해 결정되지만 그 복잡성이 개발자에게 노출되지는 않는다.
 
-X> ## 연습 문제
-X>
-X> 1. (쉬움) 어떤 타입 `a`에 대해 절대 비어있지 않은 배열을 나타내기 위해 아래처럼 타입을 선언했다.
-X>
-X>     ```haskell
-X>     data NonEmpty a = NonEmpty a (Array a)
-X>     ```
-X>
-X>     `NonEmpty a` 타입에 대한 `Eq` 인스턴스를 작성해보라. `Eq a`와 `Eq (Array a)`의 인스턴스를 재사용해야 할 것이다.
-X> 1. (보통) `NonEmpty a` 타입에 대한 `Semigroup` 인스턴스를 작성해보라. `Array`에 대한 `Semigroup` 인스턴스를 재사용하면 된다.
-X> 1. (보통) `NonEmpty`에 대한 `Functor` 인스턴스를 작성해보라.
-X> 1. (보통) `a` 타입에 대해 `Ord` 인스턴스가 주어졌을 때 해당 타입의 어떤 값보다 더 큰 "무한대"를 추가하여 아래처럼 확장된 타입을 정의할 수 있다.
-X>
-X>     ```haskell
-X>     data Extended a = Finite a | Infinite
-X>     ```
-X>
-X>     `Extended a`  타입에 대한 `Ord` 인스턴스를 작성해보라. `a` 타입의 `Ord`  인스턴스를 재사용하면 된다.
-X> 1. (어려움) `NonEmpty` 타입에 대한 `Foldable` 인스턴스를 작성해보라. **힌트**: 배열의 `Foldable` 인스턴스를 재사용하라.
-X> 1. (어려움) 순서가 있는 컨테이너를 정의하는 타입 생성자 `f`가 있을 때 (즉, `f`는 `Foldable` 인스턴스가 정의되어 있다.) 우리는 컨테이너 맨 앞에 요소가 하나 더 추가된 새로운 컨테이너 타입을 정의할 수 있다.
-X>
-X>     ```haskell
-X>     data OneMore f a = OneMore a (f a)
-X>     ```
-X>
-X>     `OneMore f` 컨테이너의 요소들도 순서가 있다.(맨 앞에 추가된 요소가 `f`의 다른 요소들보다 앞에 있다고 본다.) `OneMore f` 타입에 대해 `Foldable` 인스턴스를 작성해보라.
-X>
-X>     ```haskell
-X>     instance foldableOneMore :: Foldable f => Foldable (OneMore f) where
-X>       ...
-X>     ```
+> ## 연습 문제
+>
+> 1. (쉬움) 어떤 타입 `a`에 대해 절대 비어있지 않은 배열을 나타내기 위해 아래처럼 타입을 선언했다.
+>
+>     ```haskell
+>     data NonEmpty a = NonEmpty a (Array a)
+>     ```
+>
+>     `NonEmpty a` 타입에 대한 `Eq` 인스턴스를 작성해보라. `Eq a`와 `Eq (Array a)`의 인스턴스를 재사용해야 할 것이다.
+> 1. (보통) `NonEmpty a` 타입에 대한 `Semigroup` 인스턴스를 작성해보라. `Array`에 대한 `Semigroup` 인스턴스를 재사용하면 된다.
+> 1. (보통) `NonEmpty`에 대한 `Functor` 인스턴스를 작성해보라.
+> 1. (보통) `a` 타입에 대해 `Ord` 인스턴스가 주어졌을 때 해당 타입의 어떤 값보다 더 큰 "무한대"를 추가하여 아래처럼 확장된 타입을 정의할 수 있다.
+>
+>     ```haskell
+>     data Extended a = Finite a | Infinite
+>     ```
+>
+>     `Extended a`  타입에 대한 `Ord` 인스턴스를 작성해보라. `a` 타입의 `Ord`  인스턴스를 재사용하면 된다.
+> 1. (어려움) `NonEmpty` 타입에 대한 `Foldable` 인스턴스를 작성해보라. **힌트**: 배열의 `Foldable` 인스턴스를 재사용하라.
+> 1. (어려움) 순서가 있는 컨테이너를 정의하는 타입 생성자 `f`가 있을 때 (즉, `f`는 `Foldable` 인스턴스가 정의되어 있다.) 우리는 컨테이너 맨 앞에 요소가 하나 더 추가된 새로운 컨테이너 타입을 정의할 수 있다.
+>
+>     ```haskell
+>     data OneMore f a = OneMore a (f a)
+>     ```
+>
+>     `OneMore f` 컨테이너의 요소들도 순서가 있다.(맨 앞에 추가된 요소가 `f`의 다른 요소들보다 앞에 있다고 본다.) `OneMore f` 타입에 대해 `Foldable` 인스턴스를 작성해보라.
+>
+>     ```haskell
+>     instance foldableOneMore :: Foldable f => Foldable (OneMore f) where
+>       ...
+>     ```
 
 ## 다중 인자 타입 클래스
 
@@ -577,48 +577,49 @@ unsafePartial :: forall a. (Partial => a) -> a
 
 수퍼클래스 관계를 정의하는 또다른 이유는 두 클래스 사이에 명백히 드러나는 "is-a" 관계를 나타내기 위함이다. 서브클래스의 모든 멤버들은 수퍼클래스의 멤버이기도 하다.
 
-X> ## 연습 문제
-X>
-X> 1. (보통) 비어있지 않은 정수 배열에서 최댓값을 찾는 부분 함수를 정의해보라. 함수의 타입은 `Partial => Array Int -> Int`여야 한다. PSCi에서는 `unsafePartial`을 이용하여 테스트해볼 수 있다. **힌트**: `Data.Foldable` 모듈의 `maximum` 함수를 이용하여 정의하면 된다.
-X> 1. (보통) 아래의 `Action` 클래스는 어떤 타입에 대한 액션을 정의하는 다중 인자 타입 클래스다.
-X>
-X>     ```haskell
-X>     class Monoid m <= Action m a where
-X>       act :: m -> a -> a
-X>     ```
-X>
-X>     여기서 **액션**이라 함은 모노이드에 해당하는 값을 이용하여 다른 타입의 어떤 값을 변환하는 함수를 말한다. `Action` 클래스는 다음의 두 법칙을 만족해야 한다.
-X>
-X>     - `act mempty a = a`
-X>     - `act (m1 <> m2) a = act m1 (act m2 a)`
-X>
-X>     이 법칙들이 말하는 바는 액션이 `Monoid` 클래스의 연산들에 따르는 법칙들에 부합하여야 한다는 것이다.
-X>
-X>     예를 들어 자연수는 곱셈 연산에 있어서 모노이드가 된다.
-X>
-X>     ```haskell
-X>     newtype Multiply = Multiply Int
-X>
-X>     instance semigroupMultiply :: Semigroup Multiply where
-X>       append (Multiply n) (Multiply m) = Multiply (n * m)
-X>
-X>     instance monoidMultiply :: Monoid Multiply where
-X>       mempty = Multiply 1
-X>     ```
-X>
-X>     이 모노이드를 이용하여 입력 문자열을 반복하여 연결하는 액션을 정의할 수 있다. 다음의 액션 인스턴스를 정의해보라.
-X>
-X>     ```haskell
-X>     instance repeatAction :: Action Multiply String
-X>     ```
-X>
-X>     이 인스턴스는 위에서 열거한 앤션 클래스의 법칙들을 만족하는가?X> 1. (보통) `Action m a => Action m (Array a)`에 해당하는 인스턴스를 작성해보라. 배열에 대한 액션은 배열의 각 요소들에 독립적으로 적용되어야 한다.
-X> 1. (어려움) 아래와 같은 뉴타입이 있을 때 `Action m (Self m)`에 대한 인스턴스를 작성해보라. 여기서 모노이드 `m`은 자기자신에 대해 `append` 액션이 적용된다.
-X>
-X>     ```haskell
-X>     newtype Self m = Self m
-X>     ```
-X> 1. (어려움) 다중 인자 타입 클래스로 정의된 `Action` 클래스에 함수적 의존 관계가 필요한가? 필요하다면 왜 그러한지, 필요하지 않다면 왜 필요하지 않은지 이유를 설명해보라.
+> ## 연습 문제
+>
+> 1. (보통) 비어있지 않은 정수 배열에서 최댓값을 찾는 부분 함수를 정의해보라. 함수의 타입은 `Partial => Array Int -> Int`여야 한다. PSCi에서는 `unsafePartial`을 이용하여 테스트해볼 수 있다. **힌트**: `Data.Foldable` 모듈의 `maximum` 함수를 이용하여 정의하면 된다.
+> 1. (보통) 아래의 `Action` 클래스는 어떤 타입에 대한 액션을 정의하는 다중 인자 타입 클래스다.
+>
+>     ```haskell
+>     class Monoid m <= Action m a where
+>       act :: m -> a -> a
+>     ```
+>
+>     여기서 **액션**이라 함은 모노이드에 해당하는 값을 이용하여 다른 타입의 어떤 값을 변환하는 함수를 말한다. `Action` 클래스는 다음의 두 법칙을 만족해야 한다.
+>
+>     - `act mempty a = a`
+>     - `act (m1 <> m2) a = act m1 (act m2 a)`
+>
+>     이 법칙들이 말하는 바는 액션이 `Monoid` 클래스의 연산들에 따르는 법칙들에 부합하여야 한다는 것이다.
+>
+>     예를 들어 자연수는 곱셈 연산에 있어서 모노이드가 된다.
+>
+>     ```haskell
+>     newtype Multiply = Multiply Int
+>
+>     instance semigroupMultiply :: Semigroup Multiply where
+>       append (Multiply n) (Multiply m) = Multiply (n * m)
+>
+>     instance monoidMultiply :: Monoid Multiply where
+>       mempty = Multiply 1
+>     ```
+>
+>     이 모노이드를 이용하여 입력 문자열을 반복하여 연결하는 액션을 정의할 수 있다. 다음의 액션 인스턴스를 정의해보라.
+>
+>     ```haskell
+>     instance repeatAction :: Action Multiply String
+>     ```
+>
+>     이 인스턴스는 위에서 열거한 앤션 클래스의 법칙들을 만족하는가?
+> 1. (보통) `Action m a => Action m (Array a)`에 해당하는 인스턴스를 작성해보라. 배열에 대한 액션은 배열의 각 요소들에 독립적으로 적용되어야 한다.
+> 1. (어려움) 아래와 같은 뉴타입이 있을 때 `Action m (Self m)`에 대한 인스턴스를 작성해보라. 여기서 모노이드 `m`은 자기자신에 대해 `append` 액션이 적용된다.
+>
+>     ```haskell
+>     newtype Self m = Self m
+>     ```
+> 1. (어려움) 다중 인자 타입 클래스로 정의된 `Action` 클래스에 함수적 의존 관계가 필요한가? 필요하다면 왜 그러한지, 필요하지 않다면 왜 필요하지 않은지 이유를 설명해보라.
 
 ## 해싱 가능한 타입을 위한 타입 클래스
 
@@ -707,21 +708,21 @@ instance hashString :: Hashable String where
 
 이 장의 소스코드에는 `Maybe`나 `Tuple` 타입을 포함하여 `Hashable` 인스턴스가 더 정의되어 있다.
 
-X> ## 연습 문제
-X>
-X> 1. (쉬움) PSCi를 이용하여 이미 정의한 여러 인스턴스들을 테스트해보라.
-X> 1. (보통) `hashEqual` 함수를 이용하여 배열 내에 중복 요소가 있는지 검사하는 함수를 작성해보라. 이 함수는 해시가 같은 경우 값도 같을 것으로 추정한 뒤 최종적으로는 `==`를 이용하여 정말 같은지 비교해야 한다. **힌트**: `Data.Array` 모듈에 정의된 `nubBy` 함수를 이용하면 좀더 쉬울 것이다.
-X> 1. (보통) 아래와 같은 뉴타입에 대해 `Hashable` 인스턴스를 정의하라. `Hashable` 타입 클래스의 법칙을 만족해야 한다.
-X>
-X>     ```haskell
-X>     newtype Hour = Hour Int
-X>
-X>     instance eqHour :: Eq Hour where
-X>       eq (Hour n) (Hour m) = mod n 12 == mod m 12
-X>     ```
-X>
-X>     `Hour` 뉴타입의 `Eq` 인스턴스는 12로 나눈 나머지만 따진다. 즉 1과 13은 같다고 본다. `Hashable` 인스턴스가 법칙을 만족함을 증명하라.
-X> 1. (어려움) `Maybe`, `Either`, `Tuple` 타입의 `Hashable` 인스턴스가 법칙을 만족함을 증명하라.
+> ## 연습 문제
+>
+> 1. (쉬움) PSCi를 이용하여 이미 정의한 여러 인스턴스들을 테스트해보라.
+> 1. (보통) `hashEqual` 함수를 이용하여 배열 내에 중복 요소가 있는지 검사하는 함수를 작성해보라. 이 함수는 해시가 같은 경우 값도 같을 것으로 추정한 뒤 최종적으로는 `==`를 이용하여 정말 같은지 비교해야 한다. **힌트**: `Data.Array` 모듈에 정의된 `nubBy` 함수를 이용하면 좀더 쉬울 것이다.
+> 1. (보통) 아래와 같은 뉴타입에 대해 `Hashable` 인스턴스를 정의하라. `Hashable` 타입 클래스의 법칙을 만족해야 한다.
+>
+>     ```haskell
+>     newtype Hour = Hour Int
+>
+>     instance eqHour :: Eq Hour where
+>       eq (Hour n) (Hour m) = mod n 12 == mod m 12
+>     ```
+>
+>     `Hour` 뉴타입의 `Eq` 인스턴스는 12로 나눈 나머지만 따진다. 즉 1과 13은 같다고 본다. `Hashable` 인스턴스가 법칙을 만족함을 증명하라.
+> 1. (어려움) `Maybe`, `Either`, `Tuple` 타입의 `Hashable` 인스턴스가 법칙을 만족함을 증명하라.
 
 ## 결론
 
