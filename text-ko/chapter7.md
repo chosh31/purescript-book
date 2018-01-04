@@ -1,4 +1,4 @@
-# Applicative Validation
+# Applicative 검사기
 
 ## 이 장의 목표
 
