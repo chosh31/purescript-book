@@ -79,7 +79,7 @@ $ pulp build -O --main Example.Rectangle --to dist/Main.js
 
 ## 행 다형성 사용하기
 
-경로를 그리는 방법은 많다. `arc` 함수는 원호를 그리고, `moveTo`, `lineTo`, `closePath` 함수는 선분들로 연결된 경로를 그리는 데 사용할 수 있다. 
+경로를 그리는 방법은 많다. `arc` 함수는 원호를 그리고, `moveTo`, `lineTo`, `closePath` 함수는 선분들로 연결된 경로를 그리는 데 사용할 수 있다.
 
 `Shape.purs` 파일은 직사각형, 호, 삼각형 이렇게 세 개의 도형을 그린다.
 
@@ -175,15 +175,15 @@ $ pulp build -O --main Example.Shapes --to dist/Main.js
 
 > ## 연습 문제
 >
-> 1. (쉬움) Experiment with the `strokePath` and `setStrokeStyle` functions in each of the examples so far.
-> 1. (쉬움) The `fillPath` and `strokePath` functions can be used to render complex paths with a common style by using a do notation block inside the function argument. Try changing the `Rectangle` example to render two rectangles side-by-side using the same call to `fillPath`. Try rendering a sector of a circle by using a combination of a piecewise-linear path and an arc segment.
-> 1. (보통) Given the following record type:
+> 1. (쉬움) `strokePath`와 `setStrokeStyle` 함수를 위의 예제들에 적용해보자.
+> 1. (쉬움) 복잡한 경로를 그리기 위해서는 do 블록에서 `fillPath`와 `strokePath` 함수를 함께 사용하면 된다. `Rectangle` 예제를 수정하여 `fillPath` 한 번에 사각형 두 개가 나란히 나오도록 바꿔보자. 또, 원호 그리기와 선분 잇기를 이용하여 부채꼴을 그려보자.
+> 1. (보통) 다음처럼 2차원 공간의 한 지점을 나타내는 레코드 타입이 있다.
 >
 >     ```haskell
 >     type Point = { x :: Number, y :: Number }
 >     ```
 >
->     which represents a 2D point, write a function `renderPath` which strokes a closed path constructed from a number of points:
+>     아래 타입에 따라 `renderPath` 함수를 정의해보자. 이 함수는 주어진 좌표 배열로 닫힌 경로를 그린다.
 >
 >     ```haskell
 >     renderPath
@@ -193,34 +193,32 @@ $ pulp build -O --main Example.Shapes --to dist/Main.js
 >       -> Eff (canvas :: Canvas | eff) Unit
 >     ```
 >
->     Given a function
+>     `f` 함수가 `0`에서 `1` 사이의 값을 받아서 `Point`를 반환한다고 할 때, 주어진 `f`에 대해 `renderPath` 함수를 이용하여 그래프를 그리는 액션 함수를 작성해보라. 그래프를 구성하는 좌표는 `f` 함수에 대해 적정 수준의 샘플링으로 구할 수 있다.
 >
 >     ```haskell
 >     f :: Number -> Point
 >     ```
 >
->     which takes a `Number` between `0` and `1` as its argument and returns a `Point`, write an action which plots `f` by using your `renderPath` function. Your action should approximate the path by sampling `f` at a finite set of points.
->
->     Experiment by rendering different paths by varying the function `f`.
+>     `f`를 바꿔가며 여러가지 경로를 그려보자.
 
-## Drawing Random Circles
+## 무작위로 원 그리기
 
-The `Example/Random.purs` file contains an example which uses the `Eff` monad to interleave two different types of side-effect: random number generation, and canvas manipulation. The example renders one hundred randomly generated circles onto the canvas.
+`Example/Random.purs` 파일에 포함된 예제는 `Eff` 모나드를 이용하여 난수 생성과 캔버스 조작이라는 두 가지 다른 부수 효과를 합친다. 이 예제는 무작위로 100개의 원을 캔버스에 그린다.
 
-The `main` action obtains a reference to the graphics context as before, and then sets the stroke and fill styles:
+`main`  액션은 그래픽 컨텍스트를 가져온 다음 스트로크와 채우기 스타일을 지정한다.
 
 ```haskell
   setFillStyle "#FF0000" ctx
   setStrokeStyle "#000000" ctx
 ```
 
-Next, the code uses the `for_` function to loop over the integers between `0` and `100`:
+`for_` 함수를 이용하여 `0`부터 `100`까지의 정수로 루프를 만든다.
 
 ```haskell
   for_ (1 .. 100) \_ -> do
 ```
 
-On each iteration, the do notation block starts by generating three random numbers distributed between `0` and `1`. These numbers represent the `x` and `y` coordinates, and the radius of a circle:
+루프의 몸체가 되는 do 블록에서는 `0`과 `1` 사이의 난수를 세 개 선택한다. 이 값은 중심의 좌표 `x`, `y`와 반지름 `r`이 된다.
 
 ```haskell
     x <- random
@@ -228,7 +226,7 @@ On each iteration, the do notation block starts by generating three random numbe
     r <- random
 ```
 
-Next, for each circle, the code creates an `Arc` based on these parameters and finally fills and strokes the arc with the current styles:
+원 하나를 그리기 위해 위의 세 값으로 `Arc`를 만들고 마지막으로 경로를 채우고 스트로크를 그린다.
 
 ```haskell
     let path = arc ctx
@@ -242,19 +240,19 @@ Next, for each circle, the code creates an `Arc` based on these parameters and f
     strokePath ctx path
 ```
 
-Build this example by specifying the `Example.Random` module as the main module:
+`Example.Random` 모듈을 지정하여 이 예제를 빌드할 수 있다.
 
 ```text
 $ pulp build -O --main Example.Random --to dist/Main.js
 ```
 
-and view the result by opening `html/index.html`.
+`html/index.html` 파일을 브라우저로 열어서 동작을 확인해보자.
 
-## Transformations
+## 변형
 
-There is more to the canvas than just rendering simple shapes. Every canvas maintains a transformation which is used to transform shapes before rendering. Shapes can be translated, rotated, scaled, and skewed.
+캔버스는 간단한 도형을 그리는 것보다 더 많은 일을 할 수 있다. 캔버스는 그리기 전에 도형을 변형할 수도 있다. 수평 이동, 회전, 확대, 기울임과 같은 변형이 가능하다.
 
-The `purescript-canvas` library supports these transformations using the following functions:
+`purescript-canvas` 라이브러리는 이러한 변형을 다음 함수로 지원한다.
 
 ```haskell
 translate :: forall eff
@@ -278,17 +276,17 @@ transform :: forall eff
           -> Eff (canvas :: CANVAS | eff) Context2D
 ```
 
-The `translate` action performs a translation whose components are specified by the properties of the `TranslateTransform` record.
+`translate` 액션은 `TranslateTransform` 레코드로 지정된 만큼 좌표를 이동시킨다.
 
-The `rotate` action performs a rotation around the origin, through some number of radians specified by the first argument.
+`rotate` 액션은 원점을 기준으로 첫 번째 인자가 지정하는 만큼 회전시킨다. 회전 각도는 라디안 단위를 사용한다.
 
-The `scale` action performs a scaling, with the origin as the center. The `ScaleTransform` record specifies the scale factors along the `x` and `y` axes.
+`scale` 액션은 원점을 기준으로 확대 혹은 축소시킨다. `ScaleTransform` 레코드로 `x` 축과 `y`축의 확대 수준을 다르게 지정할 수 있다.
 
-Finally, `transform` is the most general action of the four here. It performs an affine transformation specified by a matrix.
+`transform`은 다른 액션들보다 더 일반화된 액션이다. 행렬로 정의된 아핀 변환을 적용시킨다.
 
-Any shapes rendered after these actions have been invoked will automatically have the appropriate transformation applied.
+이 변형 액션들을 호출한 다음에 그려지는 모든 도형은 해당 변형이 적용되어 그려진다.
 
-In fact, the effect of each of these functions is to _post-multiply_ the transformation with the context's current transformation. The result is that if multiple transformations applied after one another, then their effects are actually applied in reverse:
+사실 각 액션 함수들이 하는 일은 컨텍스트의 현재 변형에 새로운 변형을 곱하기로 누적시키는 것이다. 여러 변형을 순차적으로 적용시키면 실제로는 역순으로 각 효과가 반영된다.
 
 ```haskell
 transformations ctx = do
@@ -299,13 +297,13 @@ transformations ctx = do
   renderScene
 ```
 
-The effect of this sequence of actions is that the scene is rotated, then scaled, and finally translated.
+위와 같이 세 가지 액션이 순차적으로 적용되면 실제로 해당 그림은 회전, 확대, 이동 순서로 적용된다.
 
-## Preserving the Context
+## 컨텍스트 유지하기
 
-A common use case is to render some subset of the scene using a transformation, and then to reset the transformation afterwards.
+한 장면의 일부를 그리면서 변형을 적용하는 경우에는 일부를 그린 다음 변형을 원래대로 되돌리는 것이 일반적이다.
 
-The Canvas API provides the `save` and `restore` methods, which manipulate a _stack_ of states associated with the canvas. `purescript-canvas` wraps this functionality into the following functions:
+캔버스 API가 제공하는 `save`와 `restore` 메쏘드는 캔버스의 상태를 스택처럼 관리할 수 있게 해준다. `purescript-canvas`는 다음 함수를 이용하여 이 기능을 사용할 수 있게 한다.
 
 ```haskell
 save
@@ -319,9 +317,9 @@ restore
   -> Eff (canvas :: CANVAS | eff) Context2D
 ```
 
-The `save` action pushes the current state of the context (including the current transformation and any styles) onto the stack, and the `restore` action pops the top state from the stack and restores it.
+`save` 액션은 컨텍스트의 현재 상태를 스택에 추가한다. 상태에는 현재 스타일이나 변형도 포함된다. `restore` 액션은 상태 스택에서 최신 상태를 꺼내어 복원한다.
 
-This allows us to save the current state, apply some styles and transformations, render some primitives, and finally restore the original transformation and state. For example, the following function performs some canvas action, but applies a rotation before doing so, and restores the transformation afterwards:
+이 두 함수를 이용하면 현재 상태를 저장한 다음 몇가지 스타일과 변형을 적용하여 그림을 그리고 마지막에 다시 원래의 변형과 상태로 되돌릴 수 있다. 예를 들어 다음 함수는 인자로 받은 캔버스 액션을 실행하기 전에 회전을 먼저 적용하고, 액션을 실행한 다음 변형을 원래대로 되돌린다.
 
 ```haskell
 rotated ctx render = do
@@ -331,17 +329,17 @@ rotated ctx render = do
   restore ctx
 ```
 
-In the interest of abstracting over common use cases using higher-order functions, the `purescript-canvas` library provides the `withContext` function, which performs some canvas action while preserving the original context state:
+이처럼 고차함수를 이용하여 추상화시킨 예로는 `withContext` 함수가 있다. 이 액션 함수는 다른 캔버스 액션을 실행하면서 원래의 컨텍스트 상태를 유지시킨다.
 
 ```haskell
 withContext
   :: forall eff a
    . Context2D
   -> Eff (canvas :: CANVAS | eff) a
-  -> Eff (canvas :: CANVAS | eff) a          
+  -> Eff (canvas :: CANVAS | eff) a
 ```
 
-We could rewrite the `rotated` function above using `withContext` as follows:
+`withContext` 함수를 이용하여 `rotated` 함수를 구현할 수도 있다.
 
 ```haskell
 rotated ctx render =
@@ -350,11 +348,11 @@ rotated ctx render =
     render
 ```
 
-## Global Mutable State
+## 전역 가변 상태
 
-In this section, we'll use the `purescript-refs` package to demonstrate another effect in the `Eff` monad.
+이 절에서 다룰 내용은 `purescript-refs` 패키지가 `Eff` 모나드를 이용하여 제공하는 새로운 효과다.
 
-The `Control.Monad.Eff.Ref` module provides a type constructor for global mutable references, and an associated effect:
+`Control.Monad.Eff.Ref` 모듈에는 전역 가변 참조를 위한 `Ref`라는 타입 생성자와 이와 연관된 `REF` 효과가 정의되어 있다.
 
 ```text
 > import Control.Monad.Eff.Ref
@@ -366,29 +364,29 @@ Type -> Type
 Control.Monad.Eff.Effect
 ```
 
-A value of type `Ref a` is a mutable reference cell containing a value of type `a`, much like an `STRef h a`, which we saw in the previous chapter. The difference is that, while the `ST` effect can be removed by using `runST`, the `Ref` effect does not provide a handler. Where `ST` is used to track safe, local mutation, `Ref` is used to track global mutation. As such, it should be used sparingly.
+`Ref a` 타입의 값은 `a` 타입의 값을 담을 수 있는 가변 참조 셀을 나타낸다. 앞 장에서 다루었던 `STRef h a`와 매우 비슷하다. `runST` 함수를 이용하여 `ST` 효과를 없앨 수 있었던 것과 달리 `Ref` 효과는 따로 핸들러를 제공하지 않는다. `ST`는 안전한 지역적 가변 값을 추적하는 데 사용할 수 있지만 `Ref`는 전역 가변 값을 추적하는데 사용한다. 그렇기 때문에 자주 사용해서는 안된다.
 
-The `Example/Refs.purs` file contains an example which uses the `REF` effect to track mouse clicks on the `canvas` element.
+`Example/Refs.purs` 파일에 포함된 예제는 `REF` 효과를 이용하여 `canvas` 엘리먼트에서 발생하는 마우스 클릭 이벤트를 추적한다.
 
-The code starts by creating a new reference containing the value `0`, by using the `newRef` action:
+이 코드는 먼저 `newRef` 액션을 이용하여 `0` 값을 가지는 새로운 참조를 만든다.
 
 ```haskell
   clickCount <- newRef 0
 ```
 
-Inside the click event handler, the `modifyRef` action is used to update the click count:
+클릭 이벤트 핸들러에서는 `modifyRef` 액션을 사용하여 클릭 횟수를 갱신한다.
 
 ```haskell
     modifyRef clickCount (\count -> count + 1)
 ```
 
-The `readRef` action is used to read the new click count:
+`readRef` 액션은 클릭 횟수를 읽을 때 사용한다.
 
 ```haskell
     count <- readRef clickCount
 ```
 
-In the `render` function, the click count is used to determine the transformation applied to a rectangle:
+`render` 함수에서는 클릭 횟수에 따라 다른 변형을 적용하여 사각형을 그린다.
 
 ```haskell
     withContext ctx do
@@ -408,22 +406,22 @@ In the `render` function, the click count is used to determine the transformatio
         }
 ```
 
-This action uses `withContext` to preserve the original transformation, and then applies the following sequence of transformations (remember that transformations are applied bottom-to-top):
+이 액션은 `withContext` 함수를 이용하여 원래의 변형을 유지한 채로 몇 가지 변형을 순차적으로 적용한다. (변환이 적용되는 순서는 반대라는 점을 잊지말자.)
 
-- The rectangle is translated through `(-100, -100)` so that its center lies at the origin.
-- The rectangle is scaled around the origin.
-- The rectangle is rotated through some multiple of `10` degrees around the origin.
-- The rectangle is translated through `(300, 300)` so that it center lies at the center of the canvas.
+- 사각형은 `(-100, -100)`만큼 이동하여 사각형 중심이 원점이 된다.
+- 사각형은 원점을 기준으로 확대된다.
+- 사각형은 클릭 횟수 * 10도 만큼 회전된다.
+- 사각형은 `(300, 300)`만큼 이동하여 사각형 중심이 캔버스 중심이 된다.
 
-Build the example:
+예제를 다음 명령으로 빌드한 다음 `html/index.html` 파일을 열어보자.
 
 ```text
 $ pulp build -O --main Example.Refs --to dist/Main.js
 ```
 
-and open the `html/index.html` file. If you click the canvas repeatedly, you should see a green rectangle rotating around the center of the canvas.
+캔버스를 여러번 클릭하면 녹색 사각형이 캔버스 중심을 기준으로 회전하는 모습을 볼 수 있다.
 
-> ## Examples
+> ## 연습 문제
 >
 > 1. (쉬움) Write a higher-order function which strokes and fills a path simultaneously. Rewrite the `Random.purs` example using your function.
 > 1. (보통) Use the `RANDOM` and `DOM` effects to create an application which renders a circle with random position, color and radius to the canvas when the mouse is clicked.
@@ -650,10 +648,10 @@ and open `html/index.html`. You should see the Koch curve rendered to the canvas
 >
 >     ```haskell
 >     type Angle = Number
->     
+>
 >     data Alphabet = L Angle | R Angle | F
 >     ```
->     
+>
 >     How can this new information be used in the production rules to create interesting shapes?
 > 1. (어려움) An L-system is given by an alphabet with four letters: `L` (turn left through 60 degrees), `R` (turn right through 60 degrees), `F` (move forward) and `M` (also move forward).
 >
